@@ -1,0 +1,2427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Módulo académico de Protección y Seguridad en Sistemas Operativos. Basado en el libro Sistemas Operativos Modernos, 3.ª edición, de Andrew S. Tanenbaum (Pearson, 2009), Capítulo 9.">
+  <title>Sistemas Operativos: Protección y Seguridad</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=5">
+</head>
+<body>
+
+  <!-- Barra de progreso de lectura -->
+  <div class="progress-track" aria-hidden="true"><div id="progress-bar" class="progress-bar"></div></div>
+
+  <!-- Fondo animado formal de red de seguridad -->
+  <canvas id="security-net-canvas" aria-hidden="true"></canvas>
+
+  <header>
+    <div class="header-container">
+      <div class="header-badge">SISTEMAS OPERATIVOS</div>
+      <h1>Protección y Seguridad</h1>
+      <p>Módulo de aprendizaje institucional — Conceptos fundamentales y arquitectura de protección</p>
+      <p class="header-source">Fuente principal: <strong>Sistemas Operativos Modernos</strong>, 3.ª edición — Andrew S. Tanenbaum (Pearson, 2009), Capítulo 9 «Seguridad».</p>
+
+      <!-- 👥 Equipo del módulo: integrantes, materia y docente -->
+      <div class="header-team" aria-label="Equipo del módulo">
+        <div class="team-info">
+          <span class="team-info-label">👥 Integrantes del equipo</span>
+          <div class="team-roster">
+            <div class="team-chip"><span class="tc-name">Brian Soto</span><span class="tc-id">N.C. 25410134</span></div>
+            <div class="team-chip"><span class="tc-name">Marco Olivas</span><span class="tc-id">N.C. 25410165</span></div>
+            <div class="team-chip"><span class="tc-name">Jaime Waldemar</span><span class="tc-id">N.C. 25410157</span></div>
+          </div>
+        </div>
+        <div class="team-meta">
+          <div class="meta-chip meta-materia"><span class="mc-label">📖 Materia</span><span class="mc-value">Sistemas Operativos</span></div>
+          <div class="meta-chip meta-docente"><span class="mc-label">📚 Docente</span><span class="mc-value">Mtra. Myrna Villegas Gaytán</span></div>
+        </div>
+      </div>
+
+      <!-- Mapa rápido de navegación interactiva -->
+      <nav class="quick-map" aria-label="Mapa rápido del módulo">
+        <span class="quick-map-label">🗺️ Mapa rápido del módulo</span>
+        <div class="quick-map-grid">
+          <button type="button" class="qm-tile" data-go="sec61"><span class="qm-num">6.1</span><span class="qm-txt">Concepto y objetivos</span></button>
+          <button type="button" class="qm-tile" data-go="sec62"><span class="qm-num">6.2</span><span class="qm-txt">Clasificación</span></button>
+          <button type="button" class="qm-tile" data-go="sec63"><span class="qm-num">6.3</span><span class="qm-txt">Funciones de protección</span></button>
+          <button type="button" class="qm-tile" data-go="sec64"><span class="qm-num">6.4</span><span class="qm-txt">Matrices de acceso</span></button>
+          <button type="button" class="qm-tile" data-go="sec65"><span class="qm-num">6.5</span><span class="qm-txt">Basada en lenguaje</span></button>
+          <button type="button" class="qm-tile" data-go="sec66"><span class="qm-num">6.6</span><span class="qm-txt">Validación y amenazas</span></button>
+          <button type="button" class="qm-tile" data-go="sec67"><span class="qm-num">6.7</span><span class="qm-txt">Cifrado</span></button>
+          <button type="button" class="qm-tile qm-star" data-go="secRef"><span class="qm-num">★</span><span class="qm-txt">Referencias</span></button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Navegación por pestañas + búsqueda -->
+  <nav class="nav-container" aria-label="Navegación del módulo">
+    <div class="nav-inner">
+      <ul class="nav-tabs">
+        <li><button class="tab-btn active" data-tab="sec61" onclick="openTab(event, 'sec61')"><span class="tab-badge">6.1</span> Concepto y Objetivos</button></li>
+        <li><button class="tab-btn" data-tab="sec62" onclick="openTab(event, 'sec62')"><span class="tab-badge">6.2</span> Clasificación</button></li>
+        <li><button class="tab-btn" data-tab="sec63" onclick="openTab(event, 'sec63')"><span class="tab-badge">6.3</span> Funciones</button></li>
+        <li><button class="tab-btn" data-tab="sec64" onclick="openTab(event, 'sec64')"><span class="tab-badge">6.4</span> Matrices de Acceso</button></li>
+        <li><button class="tab-btn" data-tab="sec65" onclick="openTab(event, 'sec65')"><span class="tab-badge">6.5</span> Basada en Lenguaje</button></li>
+        <li><button class="tab-btn" data-tab="sec66" onclick="openTab(event, 'sec66')"><span class="tab-badge">6.6</span> Validación y Amenazas</button></li>
+        <li><button class="tab-btn" data-tab="sec67" onclick="openTab(event, 'sec67')"><span class="tab-badge">6.7</span> Cifrado</button></li>
+        <li><button class="tab-btn" data-tab="secRef" onclick="openTab(event, 'secRef')"><span class="tab-badge">★</span> Referencias</button></li>
+      </ul>
+      <div class="nav-actions">
+        <button type="button" class="nav-action-btn panel-btn" id="btn-panel" title="Tu progreso, notas y puntuación">
+          <span class="na-icon">📊</span><span class="na-txt">Mi progreso</span>
+          <span class="na-dot" id="panel-dot" hidden></span>
+        </button>
+      </div>
+
+      <div class="search-box">
+        <label class="visually-hidden" for="search-input">Buscar en el módulo</label>
+        <input type="search" id="search-input" placeholder="Buscar en el módulo…  (Ctrl + K)" autocomplete="off" spellcheck="false">
+        <span id="search-count" class="search-count" aria-live="polite"></span>
+        <div id="search-results" class="search-results" role="listbox" hidden></div>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- 6.1 Concepto y Objetivos -->
+    <div id="sec61" class="tab-content active">
+      <div class="section-card">
+        <h2 class="section-title">6.1. Concepto y Objetivos de Protección y Seguridad</h2>
+
+        <div class="concept-box">
+          <strong>Diferencia Fundamental:</strong> La <em>Protección</em> gestiona los mecanismos internos del sistema operativo para controlar el acceso de procesos a los recursos. La <em>Seguridad</em> abarca el entorno global para salvaguardar la información contra accesos no autorizados, desastres físicos o pérdidas de datos.
+          <br><br>
+          Como dice Tanenbaum, <em>seguridad</em> es el problema completo y <em>mecanismos de protección</em> son las herramientas concretas que el sistema operativo aporta para resolverlo: la frontera entre ambos conceptos no es nítida, pero separarlos ayuda a diseñar y a evaluar un sistema.
+        </div>
+
+        <div class="book-note">
+          <span class="book-note-icon">📖</span>
+          <div><strong>En el libro:</strong> Tanenbaum, <em>Sistemas Operativos Modernos</em>, 3.ª ed., Cap. 9 «Seguridad», sección 9.1 <strong>El entorno de seguridad</strong> (amenazas, intrusos y pérdida accidental de datos) y sección 9.3 <strong>Mecanismos de protección</strong>.</div>
+        </div>
+
+        <h3 class="sub-title" id="s61a">¿Qué controla la protección?</h3>
+        <p class="lead-paragraph">
+          La <strong>protección</strong> es el conjunto de reglas que deciden <em>quién</em> puede hacer <em>qué</em> con cada recurso del sistema: memoria, archivos, dispositivos, CPU y llamadas al sistema. Todo pasa por el sistema operativo, que actúa como guardián: ningún proceso accede a un recurso sin que el SO compruebe antes si tiene derecho.
+        </p>
+        <p class="lead-paragraph">
+          Para entenderlo, conviene separar dos ideas que se confunden con facilidad:
+        </p>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Pregunta</th>
+              <th>Respuesta</th>
+              <th>Ejemplo en un sistema operativo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="subject">¿Qué se quiere lograr?</td>
+              <td><strong>Política</strong> (la norma)</td>
+              <td>«Solo el departamento de Contabilidad puede leer los archivos de nómina».</td>
+            </tr>
+            <tr>
+              <td class="subject">¿Cómo se logra?</td>
+              <td><strong>Mecanismo</strong> (la herramienta)</td>
+              <td>Una lista de control de acceso (ACL) en el archivo, comprobada por el núcleo en cada apertura.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="tip-box">
+          <span class="tip-icon">💡</span>
+          <div><strong>Regla de oro:</strong> las <em>políticas</em> las fija la organización y pueden cambiar; los <em>mecanismos</em> los implementa el sistema operativo y deben ser fiables. Un buen diseño separa ambos para poder cambiar la política sin reescribir el SO.</div>
+        </div>
+
+        <h3 class="sub-title" id="s61b">Objetivos de la Protección y de la Seguridad</h3>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Objetivos de la Protección</h3>
+            <ul>
+              <li><strong>Aislamiento:</strong> garantizar el aislamiento riguroso entre procesos en ejecución (un proceso no debe leer ni modificar la memoria de otro).</li>
+              <li><strong>Cumplimiento:</strong> asegurar el cumplimiento estricto de las políticas de acceso definidas por el administrador.</li>
+              <li><strong>Prevención:</strong> prevenir interferencias no autorizadas entre usuarios y entre procesos del sistema.</li>
+              <li><strong>Mediación total:</strong> comprobar <em>cada</em> acceso a un recurso, no solo el primero (principio de mediación completa).</li>
+              <li><strong>Auditoría:</strong> dejar registro de quién hizo qué y cuándo, para poder detectar y investigar abusos.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Objetivos de la Seguridad</h3>
+            <ul>
+              <li><strong>Confidencialidad:</strong> acceso restringido únicamente a entidades autorizadas.</li>
+              <li><strong>Integridad:</strong> salvaguarda de la información contra modificaciones indebidas (solo quien está autorizado cambia datos, y los cambios quedan registrados).</li>
+              <li><strong>Disponibilidad:</strong> operatividad continua del sistema cuando sea requerido (ataques de denegación de servicio, fallos de hardware, copias de seguridad).</li>
+              <li><strong>No repudio:</strong> poder demostrar quién realizó una acción (firmas digitales, bitácoras firmadas).</li>
+              <li><strong>Atribución:</strong> identificar de forma fiable al autor de una acción dentro del sistema.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 class="sub-title" id="s61c">La tríada de la seguridad (CIA)</h3>
+        <p class="lead-paragraph">
+          Toda política de seguridad se apoya en tres pilares, conocidos como la <strong>tríada CIA</strong>. Si alguno falla, el sistema deja de ser seguro aunque los otros dos estén intactos:
+        </p>
+        <div class="grid-3">
+          <div class="card card-cia">
+            <div class="cia-icon">🕵️</div>
+            <h3>Confidencialidad</h3>
+            <p>Solo las personas o programas autorizados pueden <strong>ver</strong> la información.</p>
+            <p class="card-example"><em>Ejemplo:</em> el archivo <code>/etc/shadow</code> solo lo lee el usuario <code>root</code> y el grupo <code>shadow</code>.</p>
+          </div>
+          <div class="card card-cia">
+            <div class="cia-icon">🛡️</div>
+            <h3>Integridad</h3>
+            <p>La información no es modificada de forma <strong>no autorizada</strong> ni se corrompe.</p>
+            <p class="card-example"><em>Ejemplo:</em> hashes SHA-256 que detectan si un archivo fue alterado en tránsito.</p>
+          </div>
+          <div class="card card-cia">
+            <div class="cia-icon">⏱️</div>
+            <h3>Disponibilidad</h3>
+            <p>Los servicios están <strong>accesibles</strong> cuando los usuarios legítimos los necesitan.</p>
+            <p class="card-example"><em>Ejemplo:</em> copias de seguridad, RAID y cortafuegos que mitigan ataques DoS.</p>
+          </div>
+        </div>
+
+        <h3 class="sub-title" id="s61d">Principios de diseño para la seguridad</h3>
+        <p class="lead-paragraph">
+          Saltzer y Schroeder formularon en 1975 los principios que rigen el diseño de sistemas protegidos; Tanenbaum los recoge como guía para construir sistemas operativos confiables. Son la base para evaluar cualquier mecanismo de protección:
+        </p>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Principio</th>
+              <th>Significado</th>
+              <th>Ejemplo en un SO</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="subject">Privilegio mínimo</td>
+              <td>Cada proceso recibe solo los permisos estrictamente necesarios para su función.</td>
+              <td>Los servicios del sistema corren como usuarios dedicados (<code>www-data</code>, <code>sshd</code>), nunca como <code>root</code>.</td>
+            </tr>
+            <tr>
+              <td class="subject">Economía de mecanismo</td>
+              <td>Diseñar mecanismos de protección <em>simplicios</em>: cuanto menos código crítico, menos fallos posibles.</td>
+              <td>Un monitor de referencia pequeño y verificable en el núcleo.</td>
+            </tr>
+            <tr>
+              <td class="subject">Mediación completa</td>
+              <td>Comprobar <em>cada</em> acceso, no solo el primero (no confiar en cachés de decisiones).</td>
+              <td>El núcleo valida la apertura de cada archivo, de cada descriptor.</td>
+            </tr>
+            <tr>
+              <td class="subject">Diseño abierto</td>
+              <td>La seguridad no debe depender de ocultar el algoritmo, sino de la clave.</td>
+              <td>AES y RSA son públicos y auditados; la seguridad reside en la clave secreta.</td>
+            </tr>
+            <tr>
+              <td class="subject">Separación de privilegios</td>
+              <td>Exigir más de una condición para acceder a una función crítica.</td>
+              <td>Autenticación de dos factores para administradores; doble confirmación para borrados.</td>
+            </tr>
+            <tr>
+              <td class="subject">Mecanismo común mínimo</td>
+              <td>Evitar compartir mecanismos entre usuarios: cada compartición es un canal de interferencia.</td>
+              <td>Memoria y tablas de páginas aisladas por proceso.</td>
+            </tr>
+            <tr>
+              <td class="subject">Aceptabilidad psicológica</td>
+              <td>La interfaz debe ser fácil de usar; si el usuario no entiende la protección, la elude.</td>
+              <td>Permisos claros (<code>rwx</code>) y avisos comprensibles al borrar archivos.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 class="sub-title" id="s61e">Amenazas, intrusos y pérdidas accidentales</h3>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Amenazas deliberadas</h3>
+            <ul>
+              <li><strong>Robo de información ("tesoro"):</strong> copiar datos valiosos (cuentas, propiedad intelectual).</li>
+              <li><strong>Chantaje y ransomware:</strong> cifrar los datos de la víctima y exigir un rescate por su devolución.</li>
+              <li><strong>Denegación de servicio (DoS/DDoS):</strong> saturar el sistema para que los usuarios legítimos no puedan usarlo.</li>
+              <li><strong>Espionaje comercial o militar:</strong> obtención clandestina de información estratégica.</li>
+              <li><strong>Sabotaje:</strong> destruir o inutilizar datos e infraestructura.</li>
+              <li><strong>Modificación de datos:</strong> alterar información sin autorización (falsificar registros, transacciones o notas).</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Pérdidas accidentales</h3>
+            <ul>
+              <li><strong>Falla de hardware:</strong> discos, memorias o fuentes de alimentación defectuosas.</li>
+              <li><strong>Falla de software:</strong> errores de programación, actualizaciones defectuosas, virus adquiridos sin querer.</li>
+              <li><strong>Error humano:</strong> borrados involuntarios, formatos erróneos, contraseñas olvidadas o escritas en papel.</li>
+              <li><strong>Desastres físicos:</strong> incendios, inundaciones, robos de equipos.</li>
+            </ul>
+            <p class="card-note">Por eso la seguridad incluye copias de seguridad, UPS, espejos de disco y planes de recuperación: <strong>no todo ataque es malicioso</strong>.</p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3>¿Quién es el intruso?</h3>
+            <p>Tanenbaum agrupa a los intrusos en cuatro categorías según su motivación:</p>
+            <ul>
+              <li><strong>Curiosos caseros:</strong> usuarios no técnicos que miran «a ver qué hay».</li>
+              <li><strong>Curiosos internos:</strong> estudiantes, programadores y técnicos que ven un reto personal en saltarse la seguridad local.</li>
+              <li><strong>Quien busca dinero:</strong> atacantes determinados que rentabilizan el ataque (ransomware, venta de datos).</li>
+              <li><strong>Espionaje comercial o militar:</strong> operaciones dirigidas y financiadas.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Hacker, cracker y compañía</h3>
+            <ul>
+              <li><strong>Hacker:</strong> persona con gran conocimiento técnico que explora los sistemas por curiosidad (aceptado, incluso deseable).</li>
+              <li><strong>Cracker:</strong> quien explota vulnerabilidades con fines ilícitos.</li>
+              <li><strong>Sombrero blanco:</strong> investiga vulnerabilidades para informar y corregirlas.</li>
+              <li><strong>Sombrero gris:</strong> explota sin autorización pero sin ánimo de lucro directo.</li>
+              <li><strong>Sombrero negro:</strong> ataca con intención de dañar o beneficiarse económicamente.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="example-container">
+          <div class="example-header">
+            <span>EJEMPLO TÉCNICO: Configuración de Permisos en el Sistema de Archivos (POSIX / Bash)</span>
+            <span>Terminal POSIX</span>
+          </div>
+          <pre><code># Inspección de permisos de un recurso crítico del sistema
+$ ls -l /etc/shadow
+-rw-r----- 1 root shadow 1245 Oct 24 10:15 /etc/shadow
+
+# Análisis del mecanismo de control de acceso:
+# - Usuario 'root' (dueño): Permisos de Lectura y Escritura (rw-)
+# - Grupo 'shadow': Permiso exclusivo de Lectura (r--)
+# - Resto de usuarios (Otros): Sin acceso asignado (---)
+#
+# Esta configuración implementa la POLÍTICA de confidencialidad:
+# solo el núcleo y los servicios de autenticación leen las contraseñas.
+
+# Respuesta del sistema ante un intento no autorizado:
+$ cat /etc/shadow
+cat: /etc/shadow: Permiso denegado
+
+# Comprobación de la identidad y los privilegios del proceso actual
+$ id
+uid=1000(brian) gid=1000(brian) grupos=1000(brian),27(sudo),44(video)
+#  uid 0 = root (dominio de privilegio total)
+#  uid 1000 = usuario común (dominio restringido)</code></pre>
+        </div>
+
+        <div class="example-container">
+          <div class="example-header">
+            <span>EJEMPLO TÉCNICO: De la política al mecanismo — permisos de un archivo de nómina</span>
+            <span>Bash / SysAdmin</span>
+          </div>
+          <pre><code># POLÍTICA: "Solo contabilidad y root leen/escriten la nómina; nadie más".
+
+# 1. Creamos el archivo y lo asignamos al grupo 'contabilidad'
+$ sudo touch /empresas/nomina_2026.csv
+$ sudo chown root:contabilidad /empresas/nomina_2026.csv
+
+# 2. MECANISMO: traducimos la política a permisos POSIX (rw-r----- )
+$ sudo chmod 640 /empresas/nomina_2026.csv
+$ ls -l /empresas/nomina_2026.csv
+-rw-r----- 1 root contabilidad 0 Oct 24 10:20 /empresas/nomina_2026.csv
+
+# 3. Verificación: un usuario ajeno al grupo queda fuera
+$ sudo -u invitado cat /empresas/nomina_2026.csv
+cat: /empresas/nomina_2026.csv: Permiso denegado
+
+# 4. Si mañana cambia la política, solo ajustamos el mecanismo:
+$ sudo chmod 600 /empresas/nomina_2026.csv   # ahora solo root</code></pre>
+        </div>
+
+        <!-- ===== LABORATORIO INTERACTIVO 6.1 ===== -->
+        <div class="lab" id="lab-flip61">
+          <div class="lab-header">
+            <span class="lab-icon">🃏</span>
+            <h4>Laboratorio: tarjetas de concepto</h4>
+            <span class="lab-hint">Toca cada tarjeta para descubrir la respuesta</span>
+          </div>
+          <div class="flip-grid">
+            <button type="button" class="flip-card"><span class="flip-inner">
+              <span class="flip-front"><span class="flip-emoji">🔒</span><strong>Confidencialidad</strong><em>¿Qué garantiza?</em></span>
+              <span class="flip-back">Que la información solo sea visible para quien está autorizado. <u>Ejemplo:</u> cifrar el archivo de nómina y dejarlo con permisos <code>600</code>.</span>
+            </span></button>
+            <button type="button" class="flip-card"><span class="flip-inner">
+              <span class="flip-front"><span class="flip-emoji">🧩</span><strong>Integridad</strong><em>¿Qué garantiza?</em></span>
+              <span class="flip-back">Que nadie altere los datos sin permiso y que todo cambio quede registrado. <u>Ejemplo:</u> firmar el hash del ejecutable antes de distribuirlo.</span>
+            </span></button>
+            <button type="button" class="flip-card"><span class="flip-inner">
+              <span class="flip-front"><span class="flip-emoji">📶</span><strong>Disponibilidad</strong><em>¿Qué garantiza?</em></span>
+              <span class="flip-back">Que el servicio esté accesible cuando se necesita. <u>Ejemplo:</u> un servidor con copias de seguridad y protección frente a ataques DoS.</span>
+            </span></button>
+            <button type="button" class="flip-card"><span class="flip-inner">
+              <span class="flip-front"><span class="flip-emoji">✍️</span><strong>No repudio</strong><em>¿Qué garantiza?</em></span>
+              <span class="flip-back">Que nadie pueda negar haber realizado una acción. <u>Ejemplo:</u> una firma digital con la clave privada del emisor.</span>
+            </span></button>
+            <button type="button" class="flip-card"><span class="flip-inner">
+              <span class="flip-front"><span class="flip-emoji">📜</span><strong>Política</strong><em>¿Qué es?</em></span>
+              <span class="flip-back">La <strong>norma</strong> que fija la organización: <em>qué se quiere lograr</em>. Ej.: «solo Contabilidad lee la nómina». Cambia con frecuencia.</span>
+            </span></button>
+            <button type="button" class="flip-card"><span class="flip-inner">
+              <span class="flip-front"><span class="flip-emoji">🔧</span><strong>Mecanismo</strong><em>¿Qué es?</em></span>
+              <span class="flip-back">La <strong>herramienta</strong> del sistema operativo: <em>cómo se logra</em>. Ej.: una ACL comprobada por el núcleo en cada apertura.</span>
+            </span></button>
+            <button type="button" class="flip-card"><span class="flip-inner">
+              <span class="flip-front"><span class="flip-emoji">🛡️</span><strong>Mediación total</strong><em>¿Qué exige?</em></span>
+              <span class="flip-back">Comprobar <strong>cada</strong> acceso a un recurso, no solo el primero. Si se valida una vez, cualquier acceso posterior queda sin vigilar.</span>
+            </span></button>
+            <button type="button" class="flip-card"><span class="flip-inner">
+              <span class="flip-front"><span class="flip-emoji">🔍</span><strong>Auditoría</strong><em>¿Qué aporta?</em></span>
+              <span class="flip-back">Registro de quién hizo qué y cuándo, para detectar abusos y poder investigarlos después del hecho.</span>
+            </span></button>
+          </div>
+          <div class="lab-footer"><span id="flip61-score" class="lab-score">0 de 8 tarjetas descubiertas</span><button type="button" class="lab-reset" data-reset="flip61">🔄 Voltear todas</button></div>
+        </div>
+
+        <div class="key-box">
+          <h4>🔑 Ideas clave de la sección 6.1</h4>
+          <ul>
+            <li><strong>Protección</strong> = mecanismos internos del SO que controlan accesos; <strong>Seguridad</strong> = objetivo global (información segura frente a amenazas y accidentes).</li>
+            <li>Se separa <strong>política</strong> (qué se quiere) de <strong>mecanismo</strong> (cómo se consigue): cambiar la política no debería exigir reescribir el SO.</li>
+            <li>La seguridad se apoya en la tríada <strong>CIA</strong>: confidencialidad, integridad y disponibilidad.</li><li>Los principios de diseño (privilegio mínimo, mediación completa, economía de mecanismo, diseño abierto…) guían la construcción de sistemas confiables.</li>
+            <li>Las pérdidas de seguridad no siempre son deliberadas: el <strong>error humano</strong> y las <strong>fallas de hardware</strong> son causas muy frecuentes.</li>
+          </ul>
+        </div>
+
+        <div class="quiz">
+          <div class="quiz-header"><span>📝 Comprueba lo aprendido — 6.1</span><span class="quiz-hint">Pulsa la opción que consideres correcta</span></div>
+          <div class="quiz-question" data-answer="b" data-explain="La protección se refiere a los mecanismos del SO; la seguridad al problema global de proteger la información frente a amenazas y accidentes.">
+            <p class="quiz-text"><strong>1.</strong> ¿Cuál es la diferencia entre protección y seguridad?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">La seguridad es interna del SO y la protección es externa.</button>
+              <button class="quiz-option" data-key="b">La protección usa mecanismos internos del SO; la seguridad abarca el objetivo global de salvaguardar la información.</button>
+              <button class="quiz-option" data-key="c">Son sinónimos exactos y pueden usarse indistintamente.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+          <div class="quiz-question" data-answer="c" data-explain="Disponibilidad: el servicio debe estar accesible cuando los usuarios legítimos lo necesitan. El ransomware ataca directamente este pilar al cifrar los datos.">
+            <p class="quiz-text"><strong>2.</strong> Un ataque de ransomware cifra todos los discos de una empresa y exige un pago. ¿Qué pilar de la tríada CIA se ve afectado directamente?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">Confidencialidad</button>
+              <button class="quiz-option" data-key="b">Integridad</button>
+              <button class="quiz-option" data-key="c">Disponibilidad</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+          <div class="quiz-question" data-answer="a" data-explain="Privilegio mínimo: cada proceso debe recibir solo los permisos estrictamente necesarios para desempeñar su función.">
+            <p class="quiz-text"><strong>3.</strong> Un servidor web ejecuta cada petición de un usuario con los permisos mínimos necesarios y nunca como root. ¿Qué principio de diseño aplica?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">Privilegio mínimo</button>
+              <button class="quiz-option" data-key="b">Diseño abierto</button>
+              <button class="quiz-option" data-key="c">Aceptabilidad psicológica</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6.2 Clasificación -->
+    <div id="sec62" class="tab-content">
+      <div class="section-card">
+        <h2 class="section-title">6.2. Clasificación Aplicada a la Seguridad</h2>
+
+        <div class="concept-box">
+          La arquitectura de seguridad se estructura jerárquicamente en cuatro capas: <strong>Seguridad Física, Operativa, Lógica y de Red</strong>. Sobre ellas se aplican además <em>criterios de evaluación</em> (TCSEC, Common Criteria) que certifican hasta qué punto un sistema es confiable, y <em>etiquetas de seguridad</em> que clasifican la propia información por niveles de secreto.
+        </div>
+
+        <div class="book-note">
+          <span class="book-note-icon">📖</span>
+          <div><strong>En el libro:</strong> Tanenbaum, Cap. 9.3.4 <strong>Sistemas confiables</strong>, 9.3.6 <strong>Modelos formales de los sistemas seguros</strong> y 9.3.7 <strong>Seguridad multinivel</strong>. Los criterios de evaluación (TCSEC y Common Criteria) se presentan aquí como complemento normativo.</div>
+        </div>
+
+        <h3 class="sub-title" id="s62a">Las cuatro capas de la seguridad</h3>
+        <p class="lead-paragraph">
+          Hablar de «seguridad» sin precisar la capa es ambiguo: proteger la sala del servidor no evita que un programa malicioso lea archivos, y configurar un cortafuegos no evita que alguien robe un portátil. Por eso la clasificación parte de cuatro capas que se apoyan unas en otras:
+        </p>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Capa</th>
+              <th>¿Qué protege?</th>
+              <th>Ejemplos concretos</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="subject">1. Física</td>
+              <td>Hardware, instalaciones e infraestructura.</td>
+              <td>Cerraduras, cámaras, tarjetas de acceso, guardar discos fuera de sitio, UPS y extintores.</td>
+            </tr>
+            <tr>
+              <td class="subject">2. Operativa</td>
+              <td>Procedimientos administrativos y personas.</td>
+              <td>Políticas de contraseñas, capacitación, separación de funciones, accesos dados de baja, auditorías.</td>
+            </tr>
+            <tr>
+              <td class="subject">3. Lógica</td>
+              <td>Controles internos del sistema operativo.</td>
+              <td>Separación modo núcleo / modo usuario, permisos de archivos, dominios de protección, registros de auditoría.</td>
+            </tr>
+            <tr>
+              <td class="subject">4. Red</td>
+              <td>La información en tránsito y los servicios expuestos.</td>
+              <td>Cortafuegos, VPN, TLS, filtrado de puertos, segmentación de redes, detección de intrusos (IDS).</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="tip-box">
+          <span class="tip-icon">💡</span>
+          <div><strong>Idea:</strong> la seguridad es una cadena: el eslabón más débil determina el nivel real. Un sistema con cifrado excelente pero la sala del servidor sin llave es un sistema inseguro.</div>
+        </div>
+
+        <h3 class="sub-title" id="s62b">Criterios de evaluación: TCSEC (naranja libro del DoD)</h3>
+        <p class="lead-paragraph">
+          El departamento de Defensa de EE. UU. publicó los <em>Trusted Computer System Evaluation Criteria</em> (TCSEC), conocidos como el «Orange Book». Es la referencia clásica para clasificar la <strong>confianza</strong> que puede depositarse en un sistema: de menor a mayor exigencia, las clases son:
+        </p>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Clase</th>
+              <th>Nombre</th>
+              <th>Exigencia principal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="subject">D</td>
+              <td>Protección mínima</td>
+              <td>Sin controles evaluados: cualquier usuario puede hacer cualquier cosa. No apto para información sensible.</td>
+            </tr>
+            <tr>
+              <td class="subject">C1</td>
+              <td>Protección discrecional</td>
+              <td>Permisos por usuario (identificación y autenticación); protege contra violaciones <em>accidentales</em>.</td>
+            </tr>
+            <tr>
+              <td class="subject">C2</td>
+              <td>Protección discrecional auditable</td>
+              <td>Aislamiento de recursos, control de accesos a nivel de usuario individual, registro de auditoría de eventos y protección de contraseñas. Es el nivel que suelen cumplir los UNIX/Linux modernos.</td>
+            </tr>
+            <tr>
+              <td class="subject">B1</td>
+              <td>Protección obligatoria</td>
+              <td>Etiquetas de seguridad asociadas a objetos y sujetos; la política ya no depende del usuario, sino de etiquetas impuestas por el administrador.</td>
+            </tr>
+            <tr>
+              <td class="subject">B2</td>
+              <td>Protección estructurada</td>
+              <td>El sistema se estructura explícitamente para la seguridad; se confía en todo el software crítico, con pruebas de configuración y gestión de instalación segura.</td>
+            </tr>
+            <tr>
+              <td class="subject">B3</td>
+              <td>Dominios de seguridad</td>
+              <td>Monitor de referencia con recuperación ante fallos, listas de acceso robustas, auditoría central y procedimientos de arranque y recuperación seguros.</td>
+            </tr>
+            <tr>
+              <td class="subject">A1</td>
+              <td>Verificación formal</td>
+              <td>Diseño verificado matemáticamente: se demuestra que la especificación cumple la política de seguridad (el máximo nivel del TCSEC).</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 class="sub-title" id="s62c">Common Criteria (ISO/IEC 15408) y niveles EAL</h3>
+        <p class="lead-paragraph">
+          El TCSEC fue sustituido por los <strong>Common Criteria</strong>, estándar internacional que unifica los criterios de muchos países. En lugar de clases únicas, define un <em>objetivo de seguridad</em> (Protection Profile) y una <em>profundidad de evaluación</em> (EAL, Evaluation Assurance Level), de 1 a 7:
+        </p>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Nivel EAL</th>
+              <th>Nombre</th>
+              <th>¿Qué se exige?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="subject">EAL 1</td><td>Funcional</td><td>Pruebas de funcionamiento del producto, sin análisis profundo.</td></tr>
+            <tr><td class="subject">EAL 2</td><td>Pruebas estructuradas</td><td>Documentación de diseño y pruebas verificables.</td></tr>
+            <tr><td class="subject">EAL 3</td><td>Verificación metódica</td><td>Diseño revisado y métodos de pruebas definidos.</td></tr>
+            <tr><td class="subject">EAL 4</td><td>Diseño metódico</td><td>Nivel habitual de productos comerciales bien evaluados (firewalls, sistemas de archivos cifrados).</td></tr>
+            <tr><td class="subject">EAL 5</td><td>Diseño semiformally</td><td>Diseño semi-formal y pruebas rigurosas con muestras.</td></tr>
+            <tr><td class="subject">EAL 6</td><td>Diseño formal</td><td>Revisión semi-formal de la implementación y muestras del código fuente.</td></tr>
+            <tr><td class="subject">EAL 7</td><td>Verificación formal</td><td>Diseño formal completo y pruebas exhaustivas: reservado a sistemas críticos.</td></tr>
+          </tbody>
+        </table>
+        <div class="note-box">
+          <span class="note-icon">📌</span>
+          <div><strong>No confundir:</strong> un EAL alto garantiza que el producto <em>hace lo que dice que hace</em>, no que sea «infalible». La seguridad total no existe: se trata de reducir el riesgo a un nivel aceptable.</div>
+        </div>
+
+        <h3 class="sub-title" id="s62d">Clasificación de la información: seguridad multinivel</h3>
+        <p class="lead-paragraph">
+          Cuando un sistema maneja información clasificada (gobiernos, defensa, bancos), los <strong>sujetos</strong> (usuarios/procesos) y los <strong>objetos</strong> (archivos, mensajes) reciben una <em>etiqueta de seguridad</em>. El modelo clásico de Bell-LaPadula —que Tanenbaum expone en la sección de seguridad multinivel— impone dos reglas:
+        </p>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Regla de lectura: «no se lee hacia arriba»</h3>
+            <p>Un sujeto solo puede <strong>leer</strong> objetos en su nivel o en niveles <strong>inferiores</strong>: nunca por encima de su clasificación.</p>
+            <p class="card-example"><em>Ejemplo:</em> un usuario con etiqueta «Confidencial» intenta abrir un archivo «Secreto» → <strong>acceso denegado</strong>.</p>
+          </div>
+          <div class="card">
+            <h3>Regla de escritura: «no se escribe hacia abajo»</h3>
+            <p>Un sujeto solo puede <strong>escribir</strong> objetos en su nivel o en niveles <strong>superiores</strong>: nunca por debajo de su clasificación.</p>
+            <p class="card-example"><em>Evita:</em> que un usuario de nivel bajo introduzca datos falsos o filtrados en un informe clasificado más alto.</p>
+          </div>
+        </div>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Nivel de etiqueta</th>
+              <th>Tipo de información</th>
+              <th>¿Quién puede verla?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="subject">Público / No clasificado</td><td>Información abierta</td><td>Cualquier usuario del sistema.</td></tr>
+            <tr><td class="subject">Confidencial</td><td>Información interna restringida</td><td>Personal autorizado del área.</td></tr>
+            <tr><td class="subject">Secreto</td><td>Información sensible</td><td>Solo personal con acreditación específica.</td></tr>
+            <tr><td class="subject">Muy secreto</td><td>Información crítica</td><td>Acceso estrictamente limitado y auditado.</td></tr>
+          </tbody>
+        </table>
+
+        <div class="example-container">
+          <div class="example-header">
+            <span>EJEMPLO TÉCNICO: Seguridad Lógica - Verificación de Privilegios de Proceso (C API)</span>
+            <span>Lenguaje C</span>
+          </div>
+          <pre><code>#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/types.h&gt;
+
+int main() {
+    // Consulta de la identidad del ejecutor a nivel de Kernel
+    uid_t uid = getuid();
+    printf("ID de Usuario asociando al proceso en ejecución (UID): %d\n", uid);
+
+    if (uid == 0) {
+        printf("Estado de Privilegios: Modo Kernel / Dominio Root (Control Total)\n");
+    } else {
+        printf("Estado de Privilegios: Modo Usuario Estándar (Acceso Restringido)\n");
+    }
+
+    return 0;
+}</code></pre>
+        </div>
+
+        <div class="example-container">
+          <div class="example-header">
+            <span>EJEMPLO TÉCNICO: Capa lógica — seguridad obligatoria (etiquetas) con SELinux en Linux</span>
+            <span>Bash / SELinux</span>
+          </div>
+          <pre><code># Estado del módulo de seguridad obligatoria (MAC) del núcleo
+$ sestatus
+SELinux status:                 enabled
+SELinuxfs mount:                /sys/fs/selinux
+SELinux root directory:         /etc/selinux
+Loaded policy name:             targeted
+Current mode:                  enforcing      # aplica la política sin excepciones
+Mode from config file:          enforcing
+
+# Modos de funcionamiento:
+#   enforcing  -> bloquea y registra toda violación (producción)
+#   permissive -> solo registra, no bloquea (diagnóstico / auditoría)
+#   disabled   -> sin etiquetas: solo quedan los permisos clásicos (DAC)
+
+# Aunque seas root, SELinux puede denegarte el acceso si la etiqueta no lo permite:
+$ cat /etc/shadow
+cat: /etc/shadow: Permiso denegado     # root sin contexto 'unconfined_u:unconfined_r:unconfined_t:s0'
+
+# Consulta de la etiqueta (contexto de seguridad) de un archivo
+$ ls -Z /etc/shadow
+-rw-r-----. root shadow system_u:object_r:shadow_t:s0 /etc/shadow</code></pre>
+        </div>
+
+        <!-- ===== LABORATORIO INTERACTIVO 6.2 ===== -->
+        <div class="lab" id="lab-blp">
+          <div class="lab-header">
+            <span class="lab-icon">🔐</span>
+            <h4>Laboratorio: simulador Bell-LaPadula</h4>
+            <span class="lab-hint">Elige sujeto, objeto y operación… el modelo decide</span>
+          </div>
+
+          <div class="blp-controls">
+            <div class="blp-field">
+              <span class="blp-label">👤 Nivel del <strong>sujeto</strong></span>
+              <div class="seg" data-group="subject">
+                <button type="button" data-val="0">U · Público</button>
+                <button type="button" data-val="1">C · Confidencial</button>
+                <button type="button" data-val="2" class="active">S · Secreto</button>
+                <button type="button" data-val="3">TS · Estricto</button>
+              </div>
+            </div>
+            <div class="blp-field">
+              <span class="blp-label">📁 Nivel del <strong>objeto</strong></span>
+              <div class="seg" data-group="object">
+                <button type="button" data-val="0">U · Público</button>
+                <button type="button" data-val="1">C · Confidencial</button>
+                <button type="button" data-val="2" class="active">S · Secreto</button>
+                <button type="button" data-val="3">TS · Estricto</button>
+              </div>
+            </div>
+            <div class="blp-field">
+              <span class="blp-label">⚡ Operación</span>
+              <div class="seg" data-group="op">
+                <button type="button" data-val="read" class="active">📖 Leer</button>
+                <button type="button" data-val="write">✏️ Escribir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="blp-ladder" aria-hidden="true">
+            <div class="rung" data-lvl="3"><span>TS</span><b>Estrictamente secreto</b></div>
+            <div class="rung" data-lvl="2"><span>S</span><b>Secreto</b></div>
+            <div class="rung" data-lvl="1"><span>C</span><b>Confidencial</b></div>
+            <div class="rung" data-lvl="0"><span>U</span><b>Público</b></div>
+          </div>
+
+          <div id="blp-result" class="blp-result" role="status" aria-live="polite"></div>
+
+          <p class="blp-summary">Recuerda las dos reglas de Bell-LaPadula: <strong>no leer hacia arriba</strong> (un sujeto solo lee objetos de su nivel o inferiores) y <strong>no escribir hacia abajo</strong> (un sujeto solo escribe en objetos de su nivel o superiores). Su complemento, el modelo de <strong>Biba</strong>, protege la integridad con las reglas invertidas.</p>
+        </div>
+
+        <div class="key-box">
+          <h4>🔑 Ideas clave de la sección 6.2</h4>
+          <ul>
+            <li>La seguridad se organiza en <strong>cuatro capas</strong>: física, operativa, lógica y de red; todas deben estar cubiertas.</li>
+            <li>El <strong>TCSEC</strong> clasifica la confianza del sistema en clases D, C1/C2 (discrecional) y B1–B3/A1 (obligatoria y verificada).</li>
+            <li><strong>Common Criteria (ISO/IEC 15408)</strong> sustituye al TCSEC y añade los niveles de evaluación EAL 1–7.</li>
+            <li>La <strong>seguridad multinivel</strong> etiqueta sujetos y objetos; el modelo de Bell-LaPadula prohíbe «leer hacia abajo» y «escribir hacia arriba».</li>
+            <li>La <strong>seguridad lógica</strong> es la capa que implementa el sistema operativo: modos de ejecución, permisos, etiquetas y auditoría.</li>
+          </ul>
+        </div>
+
+        <div class="quiz">
+          <div class="quiz-header"><span>📝 Comprueba lo aprendido — 6.2</span><span class="quiz-hint">Pulsa la opción que consideres correcta</span></div>
+          <div class="quiz-question" data-answer="b" data-explain="C2 añade control de acceso a nivel individual, registro de auditoría y aislamiento de recursos; B1 y superiores exigen etiquetas de seguridad obligatorias.">
+            <p class="quiz-text"><strong>1.</strong> ¿Cuál de estas características define la clase C2 del TCSEC?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">Verificación formal matemática del diseño.</button>
+              <button class="quiz-option" data-key="b">Control de acceso por usuario, auditoría de eventos y protección de contraseñas.</button>
+              <button class="quiz-option" data-key="c">Etiquetas de seguridad obligatorias en todos los objetos.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+          <div class="quiz-question" data-answer="c" data-explain="EAL 4 es el nivel más habitual en productos comerciales evaluados (firewalls, cifrado de disco); EAL 7 está reservado a sistemas críticos.">
+            <p class="quiz-text"><strong>2.</strong> Un fabricante de cortafuegos dice que su producto está certificado en EAL 4. ¿Qué significa?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">Que el producto es imposible de hackear.</button>
+              <button class="quiz-option" data-key="b">Que el producto no tiene errores de software.</button>
+              <button class="quiz-option" data-key="c">Que su diseño y pruebas fueron evaluados con un nivel medio-alto de rigor documentado.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+          <div class="quiz-question" data-answer="a" data-explain="«No se lee hacia abajo»: un sujeto de nivel inferior no puede leer información clasificada en un nivel superior.">
+            <p class="quiz-text"><strong>3.</strong> En el modelo de Bell-LaPadula, un usuario con etiqueta «Confidencial» intenta abrir un archivo «Muy secreto». ¿Qué ocurre?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">Se deniega la lectura: violaría la propiedad de lectura simple.</button>
+              <button class="quiz-option" data-key="b">Se permite, porque el usuario está autenticado.</button>
+              <button class="quiz-option" data-key="c">Se permite, pero el archivo queda registrado como leído.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6.3 Funciones del Sistema de Protección -->
+    <div id="sec63" class="tab-content">
+      <div class="section-card">
+        <h2 class="section-title">6.3. Funciones del Sistema de Protección</h2>
+
+        <div class="concept-box">
+          El subsistema de protección coordina la interacción entre procesos y recursos mediante la administración de <strong>Dominios de Protección</strong> y la aplicación estricta del principio de menor privilegio. Cada proceso se ejecuta dentro de un dominio que define qué objetos puede tocar y con qué derechos.
+        </div>
+
+        <div class="book-note">
+          <span class="book-note-icon">📖</span>
+          <div><strong>En el libro:</strong> Tanenbaum, Cap. 9.3 <strong>Mecanismos de protección</strong>: 9.3.1 <em>Dominios de protección</em>, 9.3.4 <em>Sistemas confiables</em> y 9.3.5 <em>Base de cómputo confiable</em> (TCB).</div>
+        </div>
+
+        <h3 class="sub-title" id="s63a">Funciones esenciales</h3>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Funciones Esenciales</h3>
+            <ul>
+              <li><strong>Aplicación continua del privilegio mínimo:</strong> cada proceso recibe solo los derechos necesarios y los cede al terminar su tarea.</li>
+              <li><strong>Asignación y revocación dinámica de derechos:</strong> el administrador puede otorgar y retirar permisos en caliente (nuevo usuario en un grupo, baja de un empleado).</li>
+              <li><strong>Aislamiento del espacio de direcciones:</strong> la MMU impide que un proceso lea o escriba la memoria de otro (base/límite, tablas de páginas con bits de protección).</li>
+              <li><strong>Supervisión de validez en llamadas al sistema:</strong> se comprueban parámetros, punteros y descriptores antes de ejecutar cualquier operación privilegiada.</li>
+              <li><strong>Registro de auditoría:</strong> quién accedió a qué, cuándo y con qué resultado, para investigar incidentes.</li>
+              <li><strong>Control de E/S:</strong> solo el kernel accede directamente a dispositivos; el usuario lo hace a través de llamadas validadas.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Dominio de Protección</h3>
+            <p>Estructura formal definida por un conjunto de pares <code>&lt;Objeto, Derechos&gt;</code> que estipula las operaciones autorizadas sobre los recursos del sistema en un intervalo dado.</p>
+            <p class="card-note">Un <strong>objeto</strong> puede ser un archivo, un dispositivo, una región de memoria o incluso otro dominio. Un <strong>derecho</strong> es cualquier operación posible: leer, escribir, ejecutar, imprimir, borrar, poseer o administrar.</p>
+          </div>
+        </div>
+
+        <h3 class="sub-title" id="s63b">Ejemplos de dominios en un sistema real</h3>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Dominio</th>
+              <th>Quién lo ocupa</th>
+              <th>Derechos típicos (pares &lt;objeto, derechos&gt;)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="subject">Dominio Kernel (modo núcleo)</td>
+              <td>El propio sistema operativo</td>
+              <td>&lt;disco, leer/escribir&gt;, &lt;memoria, todas&gt;, &lt;CPU, control&gt;, &lt;puertos, abrir/cerrar&gt;</td>
+            </tr>
+            <tr>
+              <td class="subject">Dominio Root / Administrador</td>
+              <td>Procesos con UID 0 (sudo, servicios)</td>
+              <td>&lt;cualquier archivo, leer/escribir/borrar&gt;, &lt;usuarios, crear/eliminar&gt;</td>
+            </tr>
+            <tr>
+              <td class="subject">Dominio Usuario</td>
+              <td>Procesos corriendo como usuario común</td>
+              <td>&lt;sus archivos, leer/escribir&gt;, &lt;/etc, solo lectura&gt;, &lt;red, conectar&gt;</td>
+            </tr>
+            <tr>
+              <td class="subject">Dominio Invitado</td>
+              <td>Cuentas de acceso limitado</td>
+              <td>&lt;sus archivos, leer&gt;, nada más</td>
+            </tr>
+            <tr>
+              <td class="subject">Dominio de servicio</td>
+              <td>Demonios dedicados (www-data, sshd)</td>
+              <td>&lt;su directorio web, leer&gt;, &lt;log propio, escribir&gt; — sin acceso al resto</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 class="sub-title" id="s63c">Monitor de referencia y base de cómputo confiable</h3>
+        <p class="lead-paragraph">
+          Toda llamada al sistema debe atravesar un <strong>monitor de referencia</strong>: el componente (siempre presente, siempre invocado, imposible de eludir) que comprueba cada acceso contra la matriz de permisos. El conjunto de hardware, software y procedimientos que forman ese monitor es la <strong>Base de Cómputo Confiable (TCB)</strong>: si la TCB se compromete, nada queda protegido.
+        </p>
+        <pre class="diagram"><code>   Proceso (dominio Usuario)              Proceso (dominio Kernel)
+            |                                       |
+   open("/etc/shadow")                   ejecuta la operación
+            |                                       |
+            v                                       |
+   +--------------------------+                    |
+   |   MONITOR DE REFERENCIA  |                    |
+   |  (kernel + MMU + ACL)    |                    |
+   |  1. ¿tiene derecho?      |                    |
+   |  2. registra el intento  |                    |
+   +--------------------------+                    |
+        |            |                            |
+   DENEGADO      PERMITIDO ----------------------+
+   (403/EACCES)   (descriptor)      acceso al objeto</code></pre>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Requisitos del monitor de referencia</h3>
+            <ul>
+              <li><strong>Siempre presente</strong> en memoria (no puede quedar en disco ni ser sobrescrito).</li>
+              <li><strong>De tamaño razonable</strong>: poco código crítico = menos fallos (economía de mecanismo).</li>
+              <li><strong>Verificable</strong>: se puede demostrar que hace exactamente lo que dice.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>La TCB en la práctica</h3>
+            <ul>
+              <li>Incluye: núcleo, gestor de memoria, sistema de archivos, control de E/S y mecanismos de autenticación.</li>
+              <li><strong>No</strong> incluye: intérpretes de comandos, editores ni aplicaciones de usuario.</li>
+              <li>Cuantos más componentes en la TCB, más superficie de ataque: por eso se diseña pequeña.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 class="sub-title" id="s63d">Cambio de dominios</h3>
+        <p class="lead-paragraph">
+          Un proceso no está condenado a vivir en un solo dominio: puede <strong>cambiar de dominio</strong> de forma controlada cuando necesita más (o menos) privilegio. En UNIX esto se ve cada día:
+        </p>
+        <ul class="styled-list">
+          <li><strong>Login:</strong> el proceso de autenticación arranca en el dominio «invitado» y, si la contraseña es correcta, cambia al dominio del usuario.</li>
+          <li><strong><code>sudo</code> / <code>su</code>:</strong> paso temporal al dominio root para una tarea concreta, y vuelta al dominio original al terminar.</li>
+          <li><strong>Binarios con setuid (<code>chmod u+s</code>):</strong> al ejecutarse, el proceso adopta el dominio del dueño del archivo (p. ej. <code>passwd</code> corre como root para actualizar <code>/etc/shadow</code>).</li>
+          <li><strong>Descenso de privilegio:</strong> los servicios modernos arrancan como root y se reducen a un usuario común antes de atender peticiones (principio de privilegio mínimo).</li>
+        </ul>
+        <div class="tip-box">
+          <span class="tip-icon">💡</span>
+          <div><strong>Precaución:</strong> todo cambio de dominio debe ser explícito, auditado y lo más breve posible. Un binario setuid root con errores es una vía clásica de <em>escalada de privilegios</em> (Tanenbaum, cap. 9.6.6).</div>
+        </div>
+
+        <div class="example-container">
+          <div class="example-header">
+            <span>EJEMPLO TÉCNICO: Control Granular de Accesos mediante ACL POSIX</span>
+            <span>Bash / SysAdmin</span>
+          </div>
+          <pre><code># Creación de recurso protegido
+$ touch informe_auditoria.docx
+
+# Asignación de reglas explícitas por rol de usuario
+$ setfacl -m u:auditor:r-- informe_auditoria.docx
+$ setfacl -m u:administrador:rw- informe_auditoria.docx
+
+# Inspección del estado del dominio de protección asignado
+$ getfacl informe_auditoria.docx
+# file: informe_auditoria.docx
+# owner: admin
+# group: sec_team
+user::rw-
+user:auditor:r--
+user:administrador:rw-
+group::r--
+mask::rw-
+other::---</code></pre>
+        </div>
+
+        <div class="example-container">
+          <div class="example-header">
+            <span>EJEMPLO TÉCNICO: Cambio de dominio con setuid — el programa passwd</span>
+            <span>Bash / UNIX</span>
+          </div>
+          <pre><code># passwd es un binario con permiso setuid: al ejecutarse, cambia de dominio
+$ ls -l /usr/bin/passwd
+-rwsr-xr-x 1 root root 68248 Jan 14 09:00 /usr/bin/passwd
+#                 ^
+#                 bit setuid (s) -> el proceso adopta el dominio 'root'
+
+# El usuario común NO podría tocar /etc/shadow... pero passwd sí, en su nombre:
+$ id
+uid=1000(brian) gid=1000(brian)
+$ passwd brian
+Cambiando la contraseña de brian.
+(current) contraseña: ********     &lt;- el proceso (dominio root) valida y escribe
+Nueva contraseña: ********
+
+# Verificación: el archivo cambió, pero solo su hash correspondiente
+$ sudo grep brian /etc/shadow
+brian:$6$re8K...$Xq1...:19682:0:99999:7:::</code></pre>
+        </div>
+
+        <!-- ===== LABORATORIO INTERACTIVO 6.3 ===== -->
+        <div class="lab" id="lab-dd">
+          <div class="lab-header">
+            <span class="lab-icon">🗂️</span>
+            <h4>Juego: ¿dominio o recurso?</h4>
+            <span class="lab-hint">Arrastra cada tarjeta a su caja — o tócala y luego la caja</span>
+          </div>
+
+          <div class="dd-board">
+            <div class="dd-pool" id="dd-pool">
+              <span class="dd-pool-label">Tarjetas mezcladas</span>
+              <div class="dd-items">
+                <button type="button" class="dd-item" data-kind="dom">Proceso del navegador</button>
+                <button type="button" class="dd-item" data-kind="res">Archivo <code>/etc/shadow</code></button>
+                <button type="button" class="dd-item" data-kind="dom">Cuenta «administrador»</button>
+                <button type="button" class="dd-item" data-kind="res">Dispositivo <code>/dev/sda</code></button>
+                <button type="button" class="dd-item" data-kind="dom">Grupo «contabilidad»</button>
+                <button type="button" class="dd-item" data-kind="res">Memoria de otro proceso</button>
+                <button type="button" class="dd-item" data-kind="dom">Terminal con sesión de root</button>
+                <button type="button" class="dd-item" data-kind="res">Tabla de rutas del equipo</button>
+                <button type="button" class="dd-item" data-kind="dom">Hilo con privilegios elevados</button>
+                <button type="button" class="dd-item" data-kind="res">Puerto TCP 22 (SSH)</button>
+              </div>
+            </div>
+
+            <div class="dd-bins">
+              <div class="dd-bin" data-bin="dom">
+                <span class="dd-bin-title">🧩 Dominio de protección</span>
+                <span class="dd-bin-hint">Quién actúa: sujeto con derechos</span>
+                <div class="dd-slot"></div>
+              </div>
+              <div class="dd-bin" data-bin="res">
+                <span class="dd-bin-title">📦 Recurso protegido</span>
+                <span class="dd-bin-hint">Sobre qué se actúa: objeto</span>
+                <div class="dd-slot"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lab-footer">
+            <span class="lab-score" id="dd-score">0 / 10 clasificadas correctamente</span>
+            <span class="dd-msg" id="dd-msg" role="status" aria-live="polite"></span>
+            <button type="button" class="lab-reset" data-reset="dd">🔄 Mezclar de nuevo</button>
+          </div>
+        </div>
+
+        <div class="key-box">
+          <h4>🔑 Ideas clave de la sección 6.3</h4>
+          <ul>
+            <li>Un <strong>dominio de protección</strong> es un conjunto de pares <code>&lt;objeto, derechos&gt;</code>: define qué puede hacer un proceso mientras está en él.</li>
+            <li>El <strong>monitor de referencia</strong> debe ser siempre presente, pequeño y verificable; junto con el hardware forma la <strong>TCB</strong>.</li>
+            <li>Las funciones del subsistema de protección incluyen aislamiento de memoria, mediación de llamadas al sistema, revocación de derechos y auditoría.</li>
+            <li>Los procesos pueden <strong>cambiar de dominio</strong> (sudo, setuid, login), pero ese cambio debe ser explícito y controlado.</li>
+            <li>Todo se rige por el <strong>principio de privilegio mínimo</strong>: ni un permiso más de los necesarios.</li>
+          </ul>
+        </div>
+
+        <div class="quiz">
+          <div class="quiz-header"><span>📝 Comprueba lo aprendido — 6.3</span><span class="quiz-hint">Pulsa la opción que consideres correcta</span></div>
+          <div class="quiz-question" data-answer="b" data-explain="El dominio es el conjunto de pares &lt;objeto, derechos&gt; que el proceso posee en un momento dado; el monitor de referencia es quien comprueba cada acceso.">
+            <p class="quiz-text"><strong>1.</strong> En un sistema con protección, ¿qué describe un «dominio»?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">El rango de direcciones físicas que usa el proceso.</button>
+              <button class="quiz-option" data-key="b">El conjunto de pares &lt;objeto, derechos&gt; disponibles para el proceso.</button>
+              <button class="quiz-option" data-key="c">El periodo de tiempo que el proceso tiene la CPU.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+          <div class="quiz-question" data-answer="c" data-explain="Un monitor de referencia debe estar siempre presente en memoria, ser invocado en cada acceso y tener un tamaño razonable y verificable.">
+            <p class="quiz-text"><strong>2.</strong> ¿Cuál de estos NO es un requisito del monitor de referencia?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">Estar siempre presente en memoria.</button>
+              <button class="quiz-option" data-key="b">Tener un tamaño razonable y ser verificable.</button>
+              <button class="quiz-option" data-key="c">Ejecutarse como aplicación de usuario para no interferir.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+          <div class="quiz-question" data-answer="a" data-explain="El bit setuid hace que el proceso adopte el dominio del dueño del archivo; por eso passwd puede modificar /etc/shadow aunque lo lance un usuario común.">
+            <p class="quiz-text"><strong>3.</strong> Un usuario sin privilegios ejecuta <code>/usr/bin/passwd</code> (binario setuid root) y su contraseña se actualiza en <code>/etc/shadow</code>. ¿Qué ocurre?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">El proceso cambia temporalmente al dominio root y vuelve después.</button>
+              <button class="quiz-option" data-key="b">El usuario obtiene permisos root permanentes en la sesión.</button>
+              <button class="quiz-option" data-key="c">El archivo /etc/shadow se copia al directorio del usuario.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6.4 Implantación de Matrices de Acceso -->
+    <div id="sec64" class="tab-content">
+      <div class="section-card">
+        <h2 class="section-title">6.4. Implantación de Matrices de Acceso</h2>
+
+        <div class="concept-box">
+          La <strong>Matriz de Acceso</strong> es un modelo abstracto donde las filas representan los <em>Sujetos (Dominios)</em> y las columnas representan los <em>Objetos (Recursos)</em>. Su implementación física se realiza mediante <strong>ACLs</strong> (por columnas) o <strong>Listas de Capacidades</strong> (por filas). En la práctica ningún sistema guarda la matriz entera: es enorme y en su mayoría vacía, así que almacena solo las casillas con derechos.
+        </div>
+
+        <div class="book-note">
+          <span class="book-note-icon">📖</span>
+          <div><strong>En el libro:</strong> Tanenbaum, Cap. 9.3.1 <strong>Dominios de protección</strong>, 9.3.2 <strong>Listas de control de acceso</strong> y 9.3.3 <strong>Capacidades</strong> (figuras 9-6 a 9-10). El modelo de matriz de acceso procede de Lampson (1971).</div>
+        </div>
+
+        <h3 class="sub-title" id="s64a">Representación de la Matriz de Acceso</h3>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Dominio \ Objeto</th>
+              <th>Documento (/sys/audit.log)</th>
+              <th>Configuración (/etc/sys.conf)</th>
+              <th>Dispositivo (Impresora_01)</th>
+              <th>Otro dominio (Dominio_Auditor)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="subject">Dominio_Admin</td>
+              <td>Lectura, Escritura, Poseer*</td>
+              <td>Lectura, Escritura</td>
+              <td>Imprimir, Configurar</td>
+              <td>Cambiar derechos</td>
+            </tr>
+            <tr>
+              <td class="subject">Dominio_Auditor</td>
+              <td>Lectura</td>
+              <td>Lectura</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr>
+              <td class="subject">Dominio_Invitado</td>
+              <td>-</td>
+              <td>-</td>
+              <td>Imprimir</td>
+              <td>-</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-caption">* La casilla <code>&lt;Dominio_Admin, Dominio_Auditor&gt;</code> ilustra que los <strong>dominios también son objetos</strong>: el administrador puede modificar los derechos de otro dominio.</p>
+
+        <h3 class="sub-title" id="s64b">Operaciones sobre la matriz: tres derechos especiales</h3>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Derecho</th>
+              <th>Significado</th>
+              <th>Ejemplo práctico</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="subject">Copiar (copy) — notación con *</td>
+              <td>Permite pasar un derecho a otro dominio <em>con o sin</em> el asterisco. Con asterisco, el receptor puede copiarlo a su vez (transmisión en cadena); sin él, se detiene ahí.</td>
+              <td>Un proceso con <code>leer*</code> puede compartir la lectura con sus procesos hijos; con <code>leer</code> (sin asterisco) no.</td>
+            </tr>
+            <tr>
+              <td class="subject">Poseer (owner)</td>
+              <td>Derecho a modificar la columna completa de un objeto: añadir o borrar derechos de cualquier dominio.</td>
+              <td>El dueño de un archivo en UNIX puede cambiar sus permisos (<code>chmod</code>).</td>
+            </tr>
+            <tr>
+              <td class="subject">Control (control)</td>
+              <td>Derecho a modificar la fila completa de un dominio: cambiar los derechos que ese dominio tiene sobre todos los objetos.</td>
+              <td>El administrador que da de baja a un usuario elimina todos sus derechos de una vez.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3>Listas de Control de Acceso (ACL)</h3>
+            <p><strong>Almacenamiento por Columnas.</strong> Cada objeto guarda un registro de los dominios con autorización para operar sobre él.</p>
+            <ul>
+              <li>Objeto = archivo → lista: <code>root:rw-, contabilidad:r--, invitado:---</code></li>
+              <li>Fácil responder: <em>«¿quiénes pueden leer este archivo?»</em></li>
+              <li>Revocar = borrar una entrada de la lista.</li>
+              <li>Es el modelo de UNIX/Linux, Windows (DACLs) y la mayoría de sistemas de archivos.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Listas de Capacidades</h3>
+            <p><strong>Almacenamiento por Filas.</strong> Cada dominio conserva una colección de credenciales («billetes») que le facultan el acceso a objetos determinados.</p>
+            <ul>
+              <li>Dominio = proceso → lista: <code>[archivoX:leer, socket443:aceptar]</code></li>
+              <li>Fácil responder: <em>«¿a qué puede acceder este proceso?»</em></li>
+              <li>Al ser transferibles, son ideales para pasar tareas entre procesos.</li>
+              <li>Difícil de revocar: hay que rastrear todas las copias repartidas.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 class="sub-title" id="s64c">Comparación: ¿cuándo conviene cada implementación?</h3>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Criterio</th>
+              <th>ACL (por columnas)</th>
+              <th>Capacidades (por filas)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="subject">Listar quién accede a un objeto</td>
+              <td>✅ Directo: está en el propio objeto.</td>
+              <td>❌ Hay que recorrer todos los dominios.</td>
+            </tr>
+            <tr>
+              <td class="subject">Listar a qué accede un sujeto</td>
+              <td>❌ Hay que recorrer todos los objetos.</td>
+              <td>✅ Directo: está en el propio dominio.</td>
+            </tr>
+            <tr>
+              <td class="subject">Revocar un derecho concreto</td>
+              <td>✅ Se borra la entrada en el objeto.</td>
+              <td>❌ Hay que localizar y eliminar todas las copias.</td>
+            </tr>
+            <tr>
+              <td class="subject">Pasar permisos a otro proceso</td>
+              <td>❌ El objeto no se mueve; hay que editar la lista.</td>
+              <td>✅ Se transfiere la capacidad (con o sin derecho de copiar).</td>
+            </tr>
+            <tr>
+              <td class="subject">Protección de la lista misma</td>
+              <td>La ACL vive en el objeto: quien controla el objeto puede modificarla (salvo bit de inmutabilidad).</td>
+              <td>La lista vive en el sujeto: el proceso podría alterarla si no está protegida → requiere hardware o núcleo que la resguarde.</td>
+            </tr>
+            <tr>
+              <td class="subject">Ejemplo real</td>
+              <td>Permisos UNIX (<code>rwx</code>), ACLs de Linux, DACL de Windows.</td>
+              <td>Handles de Windows, tokens de capabilities de Linux/Android, microkernel Mach.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="note-box">
+          <span class="note-icon">📌</span>
+          <div><strong>Revocación de accesos:</strong> con ACL es trivial (se borra la fila del sujeto en ese objeto). Con capacidades se usan dos trucos: (1) mantener un <em>índice indirecto</em> —una tabla de capacidad a objeto— que se invalida de golpe, o (2) <em>destruir el objeto</em> y recrearlo, lo que anula todas las capacidades antiguas.</div>
+        </div>
+
+        <div class="example-container">
+          <div class="example-header">
+            <span>EJEMPLO TÉCNICO: Estructura de Datos de una Lista de Capacidades</span>
+            <span>JSON Schema</span>
+          </div>
+          <pre><code>{
+  "proceso_id": 1084,
+  "dominio_asociado": "Servicio_Autenticacion",
+  "credenciales_activas": [
+    {
+      "recurso": "/var/log/auth.log",
+      "derechos_concedidos": ["READ", "WRITE", "APPEND"]
+    },
+    {
+      "recurso": "Socket_TCP_443",
+      "derechos_concedidos": ["BIND", "ACCEPT"]
+    }
+  ]
+}</code></pre>
+        </div>
+
+        <div class="example-container">
+          <div class="example-header">
+            <span>EJEMPLO TÉCNICO: La matriz de acceso en UNIX — permisos de archivo (ACL por columnas)</span>
+            <span>Bash / Permisos POSIX</span>
+          </div>
+          <pre><code># Cada archivo lleva su propia columna de la matriz: dueño, grupo y otros
+$ ls -l reporte_final.pdf
+-rw-r----- 1 brian contabilidad 5120 Oct 24 11:02 reporte_final.pdf
+ #  |  |  |    |       |
+ #  |  |  |    |       +-- grupo 'contabilidad': solo lectura (r--)
+ #  |  |  |    +---------- dueño 'brian': lectura y escritura (rw-)
+ #  |  |  +--------------- número de enlaces duros
+ #  |  +------------------ otros usuarios: nada (---)
+
+# Equivalencia octal de la misma fila de la matriz: 6 = rw-  , 4 = r--  , 0 = ---
+$ stat -c '%a %n' reporte_final.pdf
+640 reporte_final.pdf
+
+# El dueño (derecho 'owner') puede cambiar cualquier casilla de su columna
+$ chmod 600 reporte_final.pdf      # ahora nadie más accede
+
+# Implementación de capacidades en Linux (el "billete" viaja con el binario)
+$ getcap /usr/bin/ping
+/usr/bin/ping cap_net_raw=ep        # el proceso obtiene el derecho CAP_NET_RAW
+                                    # aunque no sea root: privilegio mínimo</code></pre>
+        </div>
+
+        <!-- ===== LABORATORIO INTERACTIVO 6.4 ===== -->
+        <div class="lab" id="lab-chmod">
+          <div class="lab-header">
+            <span class="lab-icon">⚙️</span>
+            <h4>Laboratorio: generador de permisos <code>chmod</code></h4>
+            <span class="lab-hint">Marca los permisos y mira el comando en vivo</span>
+          </div>
+
+          <div class="chmod-wrap">
+            <div class="chmod-grid">
+              <div class="chmod-head"><span></span><span>lectura <b>r</b></span><span>escritura <b>w</b></span><span>ejecución <b>x</b></span></div>
+              <div class="chmod-row" data-who="u">
+                <span class="chmod-who">👤 Usuario <small>(u)</small></span>
+                <label class="chk"><input type="checkbox" data-who="u" data-bit="4" checked><span>r</span></label>
+                <label class="chk"><input type="checkbox" data-who="u" data-bit="2" checked><span>w</span></label>
+                <label class="chk"><input type="checkbox" data-who="u" data-bit="1" checked><span>x</span></label>
+              </div>
+              <div class="chmod-row" data-who="g">
+                <span class="chmod-who">👥 Grupo <small>(g)</small></span>
+                <label class="chk"><input type="checkbox" data-who="g" data-bit="4" checked><span>r</span></label>
+                <label class="chk"><input type="checkbox" data-who="g" data-bit="2"><span>w</span></label>
+                <label class="chk"><input type="checkbox" data-who="g" data-bit="1" checked><span>x</span></label>
+              </div>
+              <div class="chmod-row" data-who="o">
+                <span class="chmod-who">🌐 Otros <small>(o)</small></span>
+                <label class="chk"><input type="checkbox" data-who="o" data-bit="4" checked><span>r</span></label>
+                <label class="chk"><input type="checkbox" data-who="o" data-bit="2"><span>w</span></label>
+                <label class="chk"><input type="checkbox" data-who="o" data-bit="1"><span>x</span></label>
+              </div>
+            </div>
+
+            <div class="chmod-out">
+              <div class="chmod-octal"><span>Octal</span><strong id="chmod-octal">754</strong></div>
+              <div class="chmod-cmd"><code id="chmod-cmd">chmod 754 archivo.txt</code>
+                <button type="button" class="copy-btn" id="chmod-copy">Copiar</button>
+              </div>
+              <div class="chmod-ls"><code id="chmod-ls">-rwxr-xr-- 1 juan contadores 4096 … archivo.txt</code></div>
+              <div class="chmod-verdict" id="chmod-verdict"></div>
+            </div>
+          </div>
+
+          <div class="preset-row">
+            <span class="preset-label">Atajos:</span>
+            <button type="button" class="preset" data-mode="644">644 · fichero normal</button>
+            <button type="button" class="preset" data-mode="755">755 · script ejecutable</button>
+            <button type="button" class="preset" data-mode="700">700 · solo el dueño</button>
+            <button type="button" class="preset" data-mode="600">600 · clave privada</button>
+            <button type="button" class="preset" data-mode="777">777 · ¡peligro!</button>
+          </div>
+
+          <h3 class="sub-title" id="s64lab">Matriz de acceso interactiva</h3>
+          <p class="lead-paragraph">Las matrices de acceso son el modelo <strong>conceptual</strong>; en la práctica se implementan con listas de control de acceso (ACL) o con <em>capacidades</em>. Haz <strong>clic en una casilla</strong> para alternar los derechos <code>r</code> → <code>rw</code> → <code>rwx</code> → sin acceso.</p>
+
+          <div class="matrix-lab" id="matrix-lab">
+            <table class="matrix-table aml-table">
+              <thead>
+                <tr><th>Sujeto ↓ / Objeto →</th><th><code>nómina.txt</code></th><th><code>base.dat</code></th><th><code>/dev/sda</code></th><th><code>informe.pdf</code></th></tr>
+              </thead>
+              <tbody id="aml-body"></tbody>
+            </table>
+          </div>
+
+          <div class="aml-out">
+            <div class="aml-block">
+              <span class="aml-title">📋 Equivalente en <strong>ACL</strong> (lista de control de acceso)</span>
+              <pre class="diagram" id="aml-acl">getfacl archivo</pre>
+            </div>
+            <div class="aml-block">
+              <span class="aml-title">🎟️ Equivalente en <strong>capacidades</strong></span>
+              <pre class="diagram" id="aml-cap"># sujeto → conjunto de objetos con derechos</pre>
+            </div>
+          </div>
+
+          <div class="lab-footer">
+            <span class="lab-score" id="aml-score">12 derechos asignados</span>
+            <button type="button" class="lab-reset" data-reset="aml">🔄 Reiniciar matriz</button>
+          </div>
+        </div>
+
+        <div class="key-box">
+          <h4>🔑 Ideas clave de la sección 6.4</h4>
+          <ul>
+            <li>La <strong>matriz de acceso</strong> es un modelo abstracto: filas = sujetos/dominios, columnas = objetos, casillas = derechos.</li>
+            <li>Nunca se almacena entera: se guardan <strong>ACLs</strong> (columnas) o <strong>listas de capacidades</strong> (filas).</li>
+            <li>Derechos especiales: <strong>copiar*</strong> (transmisión de derechos), <strong>poseer</strong> (modificar columna) y <strong>control</strong> (modificar fila).</li>
+            <li>ACL: fácil revocar y auditar objetos; capacidades: fáciles de transferir y de consultar por sujeto.</li>
+            <li>UNIX implementa la columna del archivo con <code>rwx</code> (dueño/grupo/otros) y las capacidades con <code>getcap</code>.</li>
+          </ul>
+        </div>
+
+        <div class="quiz">
+          <div class="quiz-header"><span>📝 Comprueba lo aprendido — 6.4</span><span class="quiz-hint">Pulsa la opción que consideres correcta</span></div>
+          <div class="quiz-question" data-answer="a" data-explain="Las ACL se almacenan por columnas: cada objeto guarda qué dominios pueden operar sobre él. Es el modelo de los permisos de archivo.">
+            <p class="quiz-text"><strong>1.</strong> En la matriz de acceso, ¿cómo se implementan las listas de control de acceso (ACL)?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">Guardando, en cada objeto, la lista de sujetos autorizados.</button>
+              <button class="quiz-option" data-key="b">Guardando, en cada sujeto, la lista de objetos a los que accede.</button>
+              <button class="quiz-option" data-key="c">Guardando una fila completa por cada archivo del sistema.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+          <div class="quiz-question" data-answer="c" data-explain="Con capacidades la revocación es difícil porque las credenciales pueden haberse copiado y repartido; con ACL basta con borrar la entrada del objeto.">
+            <p class="quiz-text"><strong>2.</strong> Un administrador necesita revocar de inmediato todos los accesos de un usuario despedido. ¿Qué implementación le resulta más sencilla?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">Lista de capacidades del usuario, porque tiene todas sus credenciales.</button>
+              <button class="quiz-option" data-key="b">Ninguna: ambas requieren reiniciar el sistema.</button>
+              <button class="quiz-option" data-key="c">ACL, borrando las entradas de ese usuario en cada objeto afectado.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+          <div class="quiz-question" data-answer="b" data-explain="El asterisco indica derecho de copia: el receptor puede transmitir el derecho a otros dominios. Sin asterisco, el derecho no se puede propagar.">
+            <p class="quiz-text"><strong>3.</strong> ¿Qué significa que un derecho de lectura figure como <code>leer*</code> en la matriz?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">Que el derecho es temporal y caduca a los 24 horas.</button>
+              <button class="quiz-option" data-key="b">Que el dominio receptor puede copiar y transmitir ese derecho a otros dominios.</button>
+              <button class="quiz-option" data-key="c">Que el derecho es de solo lectura y no admite excepciones.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6.5 Protección Basada en Lenguaje -->
+    <div id="sec65" class="tab-content">
+      <div class="section-card">
+        <h2 class="section-title">6.5. Protección Basada en el Lenguaje</h2>
+
+        <div class="concept-box">
+          Delegación del control de acceso y el aislamiento de memoria a los <strong>compiladores</strong> y <strong>entornos de ejecución</strong> (<em>runtimes</em>), garantizando la seguridad en tiempo de compilación o mediante máquinas virtuales. En lugar de confiar solo en el sistema operativo, el propio lenguaje impone reglas que el programa no puede saltarse.
+        </div>
+
+        <div class="book-note">
+          <span class="book-note-icon">📖</span>
+          <div><strong>En el libro:</strong> Tanenbaum, Cap. 9.8.3 <strong>Firma de código</strong>, 9.8.6 <strong>Encapsulamiento de código móvil</strong> y 9.8.7 <strong>Seguridad de Java</strong> (verificación de bytecode y sandbox). Complemento: OWASP y documentación de los lenguajes.</div>
+        </div>
+
+        <h3 class="sub-title" id="s65a">Ventajas arquitectónicas</h3>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Ventajas</h3>
+            <ul>
+              <li>Políticas de seguridad <strong>granulares</strong> a nivel de objetos y métodos (visibilidad <code>private</code>, <code>internal</code>, módulos).</li>
+              <li>Reducción del <em>overhead</em> por conmutación entre espacio de usuario y núcleo: muchas comprobaciones ocurren dentro del propio programa.</li>
+              <li><strong>Verificación previa</strong>: el compilador/verificador detecta errores de seguridad antes de ejecutar (tipos, alcance de variables, desbordamientos).</li>
+              <li>Código móvil más seguro: un applet o módulo descargado puede ejecutarse confinado.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Mecanismos de Control</h3>
+            <ul>
+              <li>Comprobación <strong>estricta de tipos</strong> de datos y deshabilitación de punteros libres (no aritmética de punteros arbitraria).</li>
+              <li><strong>Entornos aislados de ejecución</strong> (<em>sandboxing</em>): el código corre con un subconjunto de permisos.</li>
+              <li>Modificadores de <strong>visibilidad</strong> orientados a objetos (<code>private</code>, <code>protected</code>, paquetes, módulos).</li>
+              <li><strong>Verificación de bytecode</strong>: antes de correr, se comprueba que el código respeta las reglas de la máquina virtual.</li>
+              <li><strong>Comprobación de límites</strong> en arrays y cadenas en tiempo de ejecución.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 class="sub-title" id="s65b">¿Cuándo se comprueba? Compilación frente a ejecución</h3>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Momento de la comprobación</th>
+              <th>Qué se valida</th>
+              <th>Ejemplo</th>
+              <th>Limitación</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="subject">Tiempo de compilación</td>
+              <td>Tipos, visibilidad, alcance de variables, ausencia de ciertos errores.</td>
+              <td>Rust (préstamo/propiedad), Java (visibilidad), C# (<code>internal</code>).</td>
+              <td>El programa puede recibir datos externos que el compilador no podía conocer.</td>
+            </tr>
+            <tr>
+              <td class="subject">Carga / verificación</td>
+              <td>Que el código entregado es apto para ejecutarse en la VM.</td>
+              <td>Verificación de bytecode de la JVM antes de ejecutar una clase.</td>
+              <td>Hay que confiar en el verificador (forma parte de la TCB).</td>
+            </tr>
+            <tr>
+              <td class="subject">Tiempo de ejecución</td>
+              <td>Límites de arrays, credenciales del llamador, estado del sistema.</td>
+              <td><code>ArrayIndexOutOfBounds</code>, comprobación de permisos por pila de llamadas, <code>SecurityManager</code>.</td>
+              <td>Añade coste y solo cubre los caminos que se ejecutan.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 class="sub-title" id="s65c">Límites: por qué no basta con el lenguaje</h3>
+        <ul class="styled-list">
+          <li><strong>Hay que confiar en el compilador y en la VM:</strong> si el verificador tiene un fallo, toda la protección se cae (entran en la TCB).</li>
+          <li><strong>Puertas de escape:</strong> el código nativo (JNI, <code>unsafe</code>, llamadas al SO) sale del control del lenguaje.</li>
+          <li><strong>Confusión de tipos:</strong> romper la seguridad de tipos (p. ej. convertir un objeto en otro sin comprobar) permite acceder a datos ajenos.</li>
+          <li><strong>Errores de diseño:</strong> un método <code>public</code> mal pensado expone más de lo que debe, aunque el lenguaje funcione perfectamente.</li>
+          <li><strong>Canales laterales y TOCTOU:</strong> comprobar una condición y usarla después deja una ventana de carrera (cap. 9 del libro y 9.5.8 en ediciones posteriores).</li>
+        </ul>
+        <div class="tip-box">
+          <span class="tip-icon">💡</span>
+          <div><strong>Conclusión de Tanenbaum:</strong> la protección basada en lenguaje <em>complementa</em>, no sustituye, a la protección del sistema operativo. La defensa en profundidad combina ambas: lenguaje seguro <em>y</em> permisos mínimos en el SO.</div>
+        </div>
+
+        <div class="example-container">
+          <div class="example-header">
+            <span>EJEMPLO TÉCNICO: Encapsulamiento y Control de Seguridad en Entorno Ejecutable</span>
+            <span>Java Enterprise API</span>
+          </div>
+          <pre><code>public class ModuloSeguridad {
+    // Encapsulamiento estricto a nivel de lenguaje
+    private final String TokenAcreditacion = "AUTH_TOKEN_SECURE_9901";
+
+    public void ejecutarOperacionCritica() {
+        // Validación formal a través del administrador de seguridad del entorno
+        SecurityManager manager = System.getSecurityManager();
+        if (manager != null) {
+            manager.checkPermission(new RuntimePermission("accessRestrictedCode"));
+        }
+        System.out.println("Operación validada correctamente por la plataforma de ejecución.");
+    }
+
+    // Nadie desde fuera puede leer el token: el compilador lo impone
+    // String t = new ModuloSeguridad().TokenAcreditacion;  // ERROR DE COMPILACIÓN
+}</code></pre>
+        </div>
+
+        <div class="note-box">
+          <span class="note-icon">📌</span>
+          <div><strong>Actualización práctica:</strong> <code>System.getSecurityManager()</code> está <em>obsoleto desde Java 17</em> y eliminado en las versiones actuales. El enfoque moderno combina: módulos de Java (JPMS) para encapsulamiento, contenedores/aislamiento a nivel de sistema operativo y firmas de código. El principio —comprobar permisos antes de ejecutar una operación crítica— sigue siendo el mismo.</div>
+        </div>
+
+        <div class="example-container">
+          <div class="example-header">
+            <span>EJEMPLO TÉCNICO: Seguridad en tiempo de compilación — memoria segura sin <code>free</code> ni <code>memcpy</code> arbitraria</span>
+            <span>Rust (lenguaje moderno)</span>
+          </div>
+          <pre><code>fn main() {
+    let mut datos = vec![1, 2, 3];
+
+    // El compilador prohíbe el acceso fuera de rango en tiempo de compilación
+    // cuando puede demostrarlo estáticamente:
+    // println!("{}", datos[10]);   // error[E0277]: índice fuera de rango
+
+    // Regla de propiedad: solo un dueño puede escribir a la vez.
+    // Esto elimina de raíz las use-after-free y doble-free (clásicos del C)
+    let _copia = &datos;      // préstamo inmutable
+    datos.push(4);            // OK: nadie más está escribiendo
+
+    println!("Vector seguro: {:?}", datos);
+}</code></pre>
+        </div>
+
+        <!-- ===== LABORATORIO INTERACTIVO 6.5 ===== -->
+        <div class="lab" id="lab-acc">
+          <div class="lab-header">
+            <span class="lab-icon">🧷</span>
+            <h4>Laboratorio: despliega y profundiza</h4>
+            <span class="lab-hint">Pulsa cada cabecera para abrir o cerrar</span>
+          </div>
+          <div class="acc" id="acc65">
+            <div class="acc-item">
+              <button type="button" class="acc-head" aria-expanded="false"><span class="acc-mark">▸</span> ¿Por qué proteger también <em>en tiempo de compilación</em>?</button>
+              <div class="acc-body"><p>Porque una vez que el binario ya corre en el hardware, los permisos del SO son la única barrera restante. Si en cambio se actúa <strong>antes y durante</strong> de ejecutar el código, pueden imponerse restricciones mucho más finas: qué clases se usan, a qué memoria se accede, qué red se toca. Tanenbaum lo resume así: la seguridad en tiempo de compilación (y en tiempo de carga) añade una capa que el sistema operativo, por sí solo, no puede dar.</p></div>
+            </div>
+            <div class="acc-item">
+              <button type="button" class="acc-head" aria-expanded="false"><span class="acc-mark">▸</span> ¿Qué es exactamente una <em>sandbox</em>?</button>
+              <div class="acc-body"><p>Una caja de arena: un entorno acotado donde el código solo puede tocar los recursos que el propietario le concede explícitamente. En Java, todo programa se ejecuta dentro de una <strong>máquina virtual</strong> que valida cada acceso a memoria, archivo y red antes de ejecutarlo. Si el código intenta salir de la caja, se lanza una <code>SecurityException</code> y el programa se detiene.</p>
+              <ul class="styled-list"><li><strong>Denegación por defecto:</strong> si no está permitido expresamente, está prohibido.</li><li><strong>Validación en cada acceso</strong>, no solo al arrancar (mediación total).</li><li><strong>Separación de privilegios:</strong> el applet nunca hereda los permisos del usuario.</li></ul></div>
+            </div>
+            <div class="acc-item">
+              <button type="button" class="acc-head" aria-expanded="false"><span class="acc-mark">▸</span> ¿Qué resuelve la <em>firma de código</em>?</button>
+              <div class="acc-body"><p>El problema de la <strong>procedencia</strong>. Antes de dar privilegios a un módulo hay que responder: ¿quién lo fabricó y está intacto? La firma responde a las dos cosas a la vez: el hash del módulo se cifra con la <em>clave privada</em> del autor, y el sistema verifica con la <em>clave pública</em> (custodiada en un certificado). Si la verificación falla, no se carga el código.</p>
+              <p>En Windows se usa Authenticode, en Java los <code>.jar</code> firmados y en .NET la firma de ensamblaje.</p></div>
+            </div>
+            <div class="acc-item">
+              <button type="button" class="acc-head" aria-expanded="false"><span class="acc-mark">▸</span> ¿Y el <em>encapsulamiento de código móvil</em>?</button>
+              <div class="acc-body"><p>Cuando el código viaja por la red (un applet, un módulo descargado, un plugin), el receptor necesita saber <strong>qué derecho tiene</strong> antes de ejecutarlo. La técnica clásica es adjuntar al código un <strong>conjunto de permisos firmado</strong>: el receptor comprueba la firma y solo entonces otorga exactamente esos permisos, ni uno más.</p>
+              <div class="tip-box"><span class="tip-icon">💡</span><div><strong>Idea central:</strong> en protección basada en lenguaje, el <em>intérprete</em> se convierte en el monitor de referencia; el compilador es quien deja la huella de todos los controles en el binario.</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab" id="lab-tree">
+          <div class="lab-header">
+            <span class="lab-icon">🌳</span>
+            <h4>Asistente: ¿qué mecanismo de protección elijo?</h4>
+            <span class="lab-hint">Responde 4 preguntas y obtén tu recomendación</span>
+          </div>
+          <div class="tree" id="tree65">
+            <div class="tree-step" data-step="0">
+              <p class="tree-q">1/4 · ¿De dónde procede el código que vas a ejecutar?</p>
+              <div class="tree-opts">
+                <button type="button" data-next="1" data-tag="externo">De un tercero / descargado</button>
+                <button type="button" data-next="2" data-tag="propio">Escrito por mi equipo</button>
+              </div>
+            </div>
+            <div class="tree-step" data-step="1" hidden>
+              <p class="tree-q">2/4 · ¿Dónde se ejecutará?</p>
+              <div class="tree-opts">
+                <button type="button" data-next="3" data-tag="navegador">En el navegador de un usuario</button>
+                <button type="button" data-next="4" data-tag="servidor">En un servidor de la organización</button>
+              </div>
+            </div>
+            <div class="tree-step" data-step="2" hidden>
+              <p class="tree-q">2/4 · ¿El código manipula datos críticos (pagos, claves, identidades)?</p>
+              <div class="tree-opts">
+                <button type="button" data-next="5" data-tag="critico">Sí, datos críticos</button>
+                <button type="button" data-next="4" data-tag="normal">No, uso general</button>
+              </div>
+            </div>
+            <div class="tree-step" data-step="3" hidden>
+              <p class="tree-q">3/4 · ¿Necesita tocar archivos o la red del equipo?</p>
+              <div class="tree-opts">
+                <button type="button" data-next="6" data-tag="sandbox-estricta">Sí, y debe ser mínimo</button>
+                <button type="button" data-next="6" data-tag="sandbox">No, solo cálculo en pantalla</button>
+              </div>
+            </div>
+            <div class="tree-step" data-step="4" hidden>
+              <p class="tree-q">3/4 · ¿Se ejecuta de forma periódica y con privilegios elevados?</p>
+              <div class="tree-opts">
+                <button type="button" data-next="7" data-tag="sandbox-estricta">Sí (scripts de administración)</button>
+                <button type="button" data-next="7" data-tag="firma">No, se distribuye en paquetes</button>
+              </div>
+            </div>
+            <div class="tree-step" data-step="5" hidden>
+              <p class="tree-q">4/4 · ¿Cómo se autoriza cada operación sensible?</p>
+              <div class="tree-opts">
+                <button type="button" data-next="8" data-tag="firma">Con credenciales del usuario</button>
+                <button type="button" data-next="8" data-tag="sandbox-estricta">Con permisos implícitos</button>
+              </div>
+            </div>
+            <div class="tree-step" data-step="6" hidden>
+              <p class="tree-q">4/4 · ¿Se actualiza sin volver a compilar?</p>
+              <div class="tree-opts">
+                <button type="button" data-next="8" data-tag="firma">Sí, se descarga al vuelo</button>
+                <button type="button" data-next="8" data-tag="sandbox">No, se recompila siempre</button>
+              </div>
+            </div>
+            <div class="tree-step" data-step="7" hidden>
+              <p class="tree-q">4/4 · ¿Hay que dejar constancia de quién autorizó la ejecución?</p>
+              <div class="tree-opts">
+                <button type="button" data-next="8" data-tag="firma">Sí, es obligatorio</button>
+                <button type="button" data-next="8" data-tag="sandbox">No es imprescindible</button>
+              </div>
+            </div>
+            <div class="tree-step" data-step="8" hidden>
+              <p class="tree-q">✅ Tu recomendación</p>
+              <div class="tree-result" id="tree-result"></div>
+              <div class="tree-opts"><button type="button" data-next="0" data-tag="reset">🔄 Volver a empezar</button></div>
+            </div>
+          </div>
+          <div class="tree-trail" id="tree-trail"></div>
+        </div>
+
+        <div class="key-box">
+          <h4>🔑 Ideas clave de la sección 6.5</h4>
+          <ul>
+            <li>La protección basada en lenguaje <strong>delega</strong> el control de acceso al compilador y al entorno de ejecución.</li>
+            <li>Se comprueba en tres momentos: <strong>compilación</strong>, <strong>carga/verificación</strong> y <strong>ejecución</strong>.</li>
+            <li>Mecanismos: seguridad de tipos, visibilidad de objetos, sandboxing, verificación de bytecode y comprobación de límites.</li>
+            <li>Sus límites: confiar en el compilador/VM, puertas de escape a código nativo y errores de diseño.</li>
+            <li>Es una capa <strong>complementaria</strong>: la defensa en profundidad combina lenguaje seguro + permisos mínimos en el SO.</li>
+          </ul>
+        </div>
+
+        <div class="quiz">
+          <div class="quiz-header"><span>📝 Comprueba lo aprendido — 6.5</span><span class="quiz-hint">Pulsa la opción que consideres correcta</span></div>
+          <div class="quiz-question" data-answer="b" data-explain="La verificación de bytecode de la JVM comprueba, antes de ejecutar, que el código respeta las reglas de la máquina virtual (tipos, acceso a memoria, etc.).">
+            <p class="quiz-text"><strong>1.</strong> ¿Qué hace exactamente el verificador de bytecode de la JVM?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">Cifra el código fuente para que nadie lo lea.</button>
+              <button class="quiz-option" data-key="b">Comprueba antes de ejecutar que el código cumple las reglas de la máquina virtual.</button>
+              <button class="quiz-option" data-key="c">Comprueba que el usuario está autenticado en el servidor.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+          <div class="quiz-question" data-answer="c" data-explain="Si el compilador o el verificador tienen un fallo, la protección basada en lenguaje deja de funcionar: por eso deben considerarse parte de la TCB y combinarse con la protección del SO.">
+            <p class="quiz-text"><strong>2.</strong> ¿Cuál es el principal límite de la protección basada en lenguaje?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">Solo funciona en programas pequeños.</button>
+              <button class="quiz-option" data-key="b">Impide usar funciones del sistema operativo.</button>
+              <button class="quiz-option" data-key="c">Hay que confiar en el compilador y en la VM, que pueden tener fallos o puertas de escape.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+          <div class="quiz-question" data-answer="a" data-explain="Los modificadores de visibilidad (private, protected, módulos) restringen el acceso a datos y métodos a nivel de objetos, sin necesidad de comprobaciones en cada llamada.">
+            <p class="quiz-text"><strong>3.</strong> Un campo declarado como <code>private</code> en una clase Java…</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">No puede leerse desde otra clase: el compilador lo rechaza.</button>
+              <button class="quiz-option" data-key="b">Se puede leer desde cualquier sitio si se conoce su nombre.</button>
+              <button class="quiz-option" data-key="c">Se almacena cifrado en disco automáticamente.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6.6 Validación y Amenazas -->
+    <div id="sec66" class="tab-content">
+      <div class="section-card">
+        <h2 class="section-title">6.6. Validación y Amenazas al Sistema</h2>
+
+        <div class="concept-box">
+          Gestión de <strong>Amenazas</strong> (vectores de ataque y vulnerabilidades de software) y sistemas de <strong>Validación</strong> (mecanismos de autenticación y verificación de integridad). Si la protección responde a «¿qué permiso tiene?», la validación responde a «¿quién eres tú?» y la amenaza a «¿quién puede intentar saltárselo y cómo?».
+        </div>
+
+        <div class="book-note">
+          <span class="book-note-icon">📖</span>
+          <div><strong>En el libro:</strong> Tanenbaum, Cap. 9.1 <strong>El entorno de seguridad</strong>, 9.4 <strong>Autenticación</strong>, 9.5 <strong>Ataques internos</strong>, 9.6 <strong>Cómo explotar los errores (bugs) en el código</strong>, 9.7 <strong>Malware</strong> y 9.8 <strong>Defensas</strong>.</div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3>Vectores de Amenaza</h3>
+            <ul>
+              <li><strong>Malware:</strong> software malicioso (troyanos, gusanos, rootkits, spyware, ransomware).</li>
+              <li><strong>Desbordamiento de búfer:</strong> corrupción de la pila de memoria (<em>stack overflow</em>) por datos de más.</li>
+              <li><strong>Escalada de privilegios:</strong> explotar fallos de software para pasar de usuario común a root.</li>
+              <li><strong>Inyección de comandos y cadenas de formato:</strong> ejecutar instrucciones introducidas por el atacante.</li>
+              <li><strong>Ataques internos:</strong> bombas lógicas, trampillas (<em>trap doors</em>) y suplantación del inicio de sesión.</li>
+              <li><strong>Ingeniería social y phishing:</strong> engañar al usuario para que entregue credenciales.</li>
+              <li><strong>Denegación de servicio (DoS/DDoS):</strong> agotar recursos para dejar el servicio inutilizable.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Sistemas de Validación</h3>
+            <ul>
+              <li><strong>Autenticación multifactor (MFA):</strong> combinar algo que sabes, tienes y eres.</li>
+              <li><strong>Hashes criptográficos con sal</strong> para almacenar contraseñas (nunca en claro).</li>
+              <li><strong>Contraseñas de un solo uso</strong> y desafío-respuesta (<em>challenge-response</em>).</li>
+              <li><strong>Biometría</strong> y objetos físicos (tarjeta, llave FIDO2, token).</li>
+              <li><strong>Verificación de límites</strong> en llamadas al sistema (<em>sanitization</em> de parámetros).</li>
+              <li><strong>Firmas de código</strong> e integridad verificada (hashes de los binarios).</li>
+              <li><strong>Registros de auditoría</strong> y detección de intrusos basada en modelos.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 class="sub-title" id="s66a">Autenticación: algo que sabes, que tienes o que eres</h3>
+        <p class="lead-paragraph">
+          Tanenbaum organiza la autenticación (cap. 9.4) en tres familias según el tipo de evidencia que se exige al usuario:
+        </p>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Familia</th>
+              <th>Ejemplos</th>
+              <th>Ventaja</th>
+              <th>Debilidad típica</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="subject">Algo que <strong>sabes</strong> (contraseña)</td>
+              <td>Clave de acceso, PIN, pregunta de seguridad, contraseña de un solo uso.</td>
+              <td>Simple y barata de implementar.</td>
+              <td>Se olvida, se comparte, se filtra; vulnerable a fuerza bruta y diccionario.</td>
+            </tr>
+            <tr>
+              <td class="subject">Algo que <strong>tienes</strong> (objeto físico)</td>
+              <td>Tarjeta inteligente, llave FIDO2/USB, token TOTP (Google Authenticator), SMS.</td>
+              <td>Muy difícil de copiar a distancia.</td>
+              <td>Se puede perder o robar; el SMS es interceptable (SIM swapping).</td>
+            </tr>
+            <tr>
+              <td class="subject">Algo que <strong>eres</strong> (biometría)</td>
+              <td>Huella dactilar, iris, reconocimiento facial, voz, patrón de tecleo.</td>
+              <td>Inherente al usuario: imposible de olvidar.</td>
+              <td>Datos sensibles que no se pueden «cambiar» si se filtran; falsos positivos/negativos.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="tip-box">
+          <span class="tip-icon">💡</span>
+          <div><strong>Regla práctica:</strong> combinar familias distintas (MFA) multiplica la seguridad: robar la contraseña no basta si además hace falta la tarjeta o la huella. Un sistema de un solo factor siempre es más débil de lo que parece.</div>
+        </div>
+
+        <h3 class="sub-title" id="s66b">¿Cómo guarda realmente el SO las contraseñas?</h3>
+        <p class="lead-paragraph">
+          Ningún sistema operativo serio guarda contraseñas en claro: guarda <strong>hashes con sal</strong>. Aun así, Tanenbaum describe cómo los atacantes rompen sistemas débiles: adivinar inicios de sesión, probar contraseñas frecuentes, reutilizar credenciales filtradas y observar el tráfico. Por eso las contraseñas modernas se almacenan con algoritmos lentos (bcrypt, PBKDF2, Argon2) y se exige longitud y variedad.
+        </p>
+
+        <h3 class="sub-title" id="s66c">Explotación de errores en el código (cap. 9.6)</h3>
+        <p class="lead-paragraph">
+          El atacante no siempre «adivina»: muchas veces <em>explota</em> un error del programador. La figura clásica del libro es el <strong>desbordamiento del búfer</strong>: un programa copia datos sin comprobar el tamaño y termina sobrescribiendo la pila, incluida la dirección de retorno. El atacante coloca ahí su propia dirección y hace que la CPU ejecute su código con los privilegios del programa.
+        </p>
+        <pre class="diagram"><code>  ANTES DEL ATAQUE                    DESPUÉS DEL ATAQUE (buffer lleno de "A")
+  +---------------------+             +---------------------+
+  | parámetro           |             | parámetro           |
+  +---------------------+             +---------------------+
+  | dirección de retorno|             | 0x41414141  &lt;--     |  la CPU saltará aquí
+  +---------------------+             +---------------------+
+  | marco EBP           |             | 0x41414141  &lt;--     |  pila corrompida
+  +---------------------+             +---------------------+
+  | buffer[0..31]       |             | AAAA AAAA AAAA ...  |  datos de más
+  +---------------------+             +---------------------+
+
+  get(s) / strcpy(dst, src)           control total del flujo del programa</code></pre>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Tipo de error</th>
+              <th>Qué ocurre</th>
+              <th>Ejemplo de explotación</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="subject">Desbordamiento del búfer</td>
+              <td>Se escriben más datos de los que el búfer admite.</td>
+              <td>Sobrescribir la dirección de retorno y ejecutar código del atacante (<em>shellcode</em>).</td>
+            </tr>
+            <tr>
+              <td class="subject">Cadenas de formato</td>
+              <td>Se pasa al programa una cadena con <code>%s</code>, <code>%n</code> sin filtrar.</td>
+              <td>Leer o escribir memoria arbitraria a través de <code>printf(entrada)</code>.</td>
+            </tr>
+            <tr>
+              <td class="subject">Desbordamiento de enteros</td>
+              <td>Un cálculo numérico se desborda y el tamaño resultante es negativo o pequeño.</td>
+              <td>Asignar un búfer de 1 byte y copiar 10.000 datos.</td>
+            </tr>
+            <tr>
+              <td class="subject">Retorno a libc</td>
+              <td>Sin inyectar código, se redirige la ejecución a funciones ya presentes (p. ej. <code>system()</code>).</td>
+              <td>Evita las defensas de no-ejecución de la pila.</td>
+            </tr>
+            <tr>
+              <td class="subject">Inyección de código / comandos</td>
+              <td>El programa ejecuta instrucciones introducidas por el usuario.</td>
+              <td><code>; rm -rf /</code> en un campo de nombre de archivo o SQL.</td>
+            </tr>
+            <tr>
+              <td class="subject">Escalada de privilegios</td>
+              <td>Se abusa de un programa con más privilegios (p. ej. setuid root) para obtenerlos.</td>
+              <td>Explotar un binario setuid mal configurado y obtener una shell root.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 class="sub-title" id="s66d">Malware: el catálogo del cap. 9.7</h3>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>¿Cómo actúa?</th>
+              <th>Se propaga…</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="subject">Caballo de Troya</td>
+              <td>Programa aparentemente útil que esconde una función oculta (abrir una puerta trasera, robar datos).</td>
+              <td>El usuario lo descarga y ejecuta voluntariamente.</td>
+            </tr>
+            <tr>
+              <td class="subject">Virus</td>
+              <td>Se inserta dentro de otros programas o del sector de arranque y los infecta al ejecutarse.</td>
+              <td>Compartiendo archivos, discos o programas infectados.</td>
+            </tr>
+            <tr>
+              <td class="subject">Gusano</td>
+              <td>Programa independiente que se replica a sí mismo por la red, sin necesidad de hospedador.</td>
+              <td>Automáticamente, explotando servicios o credenciales.</td>
+            </tr>
+            <tr>
+              <td class="subject">Spyware</td>
+              <td>Recopila información del usuario (navegación, pulsaciones, datos bancarios) sin consentimiento.</td>
+              <td>Descargas accidentales, publicidad, exploit kits.</td>
+            </tr>
+            <tr>
+              <td class="subject">Rootkit</td>
+              <td>Oculta su presencia y la de otros malware alterando el propio sistema (tablas de procesos, llamadas al sistema).</td>
+              <td>Junto a otro malware, tras obtener privilegios elevados.</td>
+            </tr>
+            <tr>
+              <td class="subject">Ransomware</td>
+              <td>Cifra los archivos de la víctima y exige un rescate por la clave.</td>
+              <td>Phishing, puertas traseras, redes sin segmentar.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 class="sub-title" id="s66e">Defensas (cap. 9.8)</h3>
+        <ul class="styled-list">
+          <li><strong>Cortafuegos (firewalls):</strong> filtran el tráfico entrante/saliente según reglas (puertos, direcciones, aplicaciones).</li>
+          <li><strong>Antivirus y anti-antivirus:</strong> firmas conocidas + heurísticas + comprobación de integridad; a su vez, los atacantes ofuscan el malware para evadirlos.</li>
+          <li><strong>Firma de código:</strong> solo se ejecutan binarios firmados por su autor (Secure Boot, Windows SmartScreen).</li>
+          <li><strong>Encarcelamiento (<em>jailing</em>/contenedores):</strong> confinar procesos con pocos recursos y permisos.</li>
+          <li><strong>Detección de intrusos basada en modelos:</strong> comparar el comportamiento con un modelo de «normalidad» y alertar de desviaciones.</li>
+          <li><strong>Actualizaciones y parches:</strong> cerrar las vulnerabilidades ya conocidas (CVE) rápidamente.</li>
+          <li><strong>Principio de privilegio mínimo y separación de usuarios:</strong> que un fallo no signifique perder todo el sistema.</li>
+          <li><strong>Copias de seguridad probadas:</strong> la última línea de defensa ante ransomware y fallos.</li>
+        </ul>
+
+        <div class="example-container">
+          <div class="example-header">
+            <span>EJEMPLO TÉCNICO: Análisis de Vulnerabilidad Buffer Overflow vs. Programación Segura</span>
+            <span>Lenguaje C</span>
+          </div>
+          <pre><code>#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+void procesamientoSeguro(const char *entradaUsuario) {
+    char bufferReservado[32];
+
+    // INSEGURO: Permite sobreescritura de memoria externa
+    // strcpy(bufferReservado, entradaUsuario);
+
+    // IMPLEMENTACIÓN SEGURA: Validación explícita de límites
+    strncpy(bufferReservado, entradaUsuario, sizeof(bufferReservado) - 1);
+    bufferReservado[sizeof(bufferReservado) - 1] = '\0';
+}
+
+int main(int argc, char *argv[]) {
+    if (argc &gt; 1) {
+        procesamientoSeguro(argv[1]);
+    }
+    return 0;
+}
+
+/* Defensas de sistema operativo / compilador frente a este ataque:
+ *   -pila no ejecutable (NX/DEP)     -> el código inyectado no corre
+ *   -ASLR (aleatorización de direcciones) -> el atacante no sabe dónde saltar
+ *   -canarios de pila (stack canaries)    -> detecta la sobrescritura y aborta
+ *   -FORTIFY_SOURCE / _FORTIFY_SOURCE=3  -> comprobaciones en funciones de copia
+ *   -PIE + RELRO                        -> binario y tabla de saltos protegidos  */</code></pre>
+        </div>
+
+        <div class="example-container">
+          <div class="example-header">
+            <span>EJEMPLO TÉCNICO: Validación de contraseñas — hash con sal en Linux</span>
+            <span>Bash / OpenSSL</span>
+          </div>
+          <pre><code># Las contraseñas NUNCA se guardan en claro: se guarda su hash con sal
+$ sudo grep brian /etc/shadow
+brian:$6$Lz7m9Xqp$K1v...:19682:0:99999:7:::
+#       |    |       |
+#       |    |       +-- hash resultante (SHA-512) de la contraseña + sal
+#       |    +---------- sal única por usuario (impide tablas de rainbow)
+#       +--------------- algoritmo: $6$ = SHA-512 ($y$ = yescrypt en sistemas actuales)
+
+# Generar nosotros mismos un hash con sal (como hace el SO al crear el usuario)
+$ openssl passwd -6 -salt R4nd0mSal "MiClave_Segura_2026"
+$6$R4nd0mSal$9x2...: (hash)
+
+# Verificación: el SO calcula el hash de lo que escribes y lo compara
+$ su brian
+Contraseña: ********   # hash(introducido) == hash(alamacenado) ? acceso : denegado
+
+# Desafío-respuesta (challenge-response): validar sin enviar la clave por la red
+$ openssl rand -hex 16          # desafío aleatorio
+7f3a9c2e5b81d04f6a2c9e7b1d3f5a80</code></pre>
+        </div>
+
+        <div class="example-container">
+          <div class="example-header">
+            <span>EJEMPLO TÉCNICO: Cortafuegos por defecto denegatorio (Linux)</span>
+            <span>Bash / UFW</span>
+          </div>
+          <pre><code># Política segura: lo que no está permitido, está denegado
+$ sudo ufw default deny incoming
+$ sudo ufw default allow outgoing
+$ sudo ufw allow 22/tcp        # solo SSH
+$ sudo ufw allow 443/tcp       # solo HTTPS
+$ sudo ufw enable
+
+Status: active
+
+To                         Action      From
+--                         ------      ----
+22/tcp                     ALLOW IN    Anywhere
+443/tcp                    ALLOW IN    Anywhere
+Anywhere                   DENY IN     Anywhere
+
+# Detección de intentos fallidos (detección de intrusos básica)
+$ sudo tail -f /var/auth.log | grep "Failed password"
+Failed password for root from 198.51.100.7 port 51234 ssh2</code></pre>
+        </div>
+
+        <!-- ===== LABORATORIO INTERACTIVO 6.6 ===== -->
+        <div class="lab" id="lab-pass">
+          <div class="lab-header">
+            <span class="lab-icon">🔑</span>
+            <h4>Laboratorio: fuerza de contraseña en vivo</h4>
+            <span class="lab-hint">Escribe y observa la entropía y el tiempo estimado de descifrado</span>
+          </div>
+
+          <div class="pass-wrap">
+            <div class="pass-input-row">
+              <input type="text" id="pass-input" placeholder="Escribe una contraseña…" autocomplete="off" spellcheck="false" aria-label="Contraseña de prueba">
+              <button type="button" class="pass-gen" id="pass-gen">🎲 Generar</button>
+            </div>
+            <div class="pass-meter"><div class="pass-fill" id="pass-fill"></div></div>
+            <div class="pass-meta">
+              <span class="pass-level" id="pass-level">—</span>
+              <span class="pass-bits" id="pass-bits">0 bits de entropía</span>
+            </div>
+            <ul class="pass-checks" id="pass-checks">
+              <li data-rule="len8">Al menos 8 caracteres</li>
+              <li data-rule="len12">12 caracteres o más</li>
+              <li data-rule="upper">Una mayúscula</li>
+              <li data-rule="lower">Una minúscula</li>
+              <li data-rule="digit">Un dígito</li>
+              <li data-rule="sym">Un símbolo especial</li>
+              <li data-rule="common">Sin palabras comunes ni patrones (123, qwerty, «contraseña»)</li>
+            </ul>
+            <div class="pass-stats">
+              <div><span id="pass-time">—</span><small>tiempo de descifrado (10⁹ intentos/s)</small></div>
+              <div><span id="pass-space">—</span><small>espacio de búsqueda</small></div>
+            </div>
+            <div class="tip-box"><span class="tip-icon">💡</span><div><strong>Regla práctica (NIST SP 800-63B):</strong> la longitud vence a la complejidad. Una frase de 4 palabras aleatorias (<code>caballo-lámpara-norte-84</code>) es más segura y más fácil de recordar que <code>P@ssw0rd!</code>.</div></div>
+          </div>
+        </div>
+
+        <div class="lab" id="lab-threat">
+          <div class="lab-header">
+            <span class="lab-icon">🎯</span>
+            <h4>Juego: clasifica la amenaza</h4>
+            <span class="lab-hint">Seis rondas — ¡tienes 10 segundos por tarjeta!</span>
+          </div>
+          <div class="threat-board">
+            <div class="threat-timer"><div class="threat-timer-fill" id="threat-timer"></div></div>
+            <p class="threat-card" id="threat-card">Pulsa <strong>Empezar</strong> para comenzar</p>
+            <div class="threat-opts" id="threat-opts">
+              <button type="button" data-cat="malware">🦠 Malware</button>
+              <button type="button" data-cat="interno">🕵️ Ataque interno</button>
+              <button type="button" data-cat="externo">🌐 Ataque externo</button>
+              <button type="button" data-cat="fisico">🔥 Fallo físico / desastre</button>
+            </div>
+            <div class="lab-footer">
+              <span class="lab-score" id="threat-score">Ronda 0/6 · 0 aciertos</span>
+              <span class="dd-msg" id="threat-msg" role="status" aria-live="polite"></span>
+              <button type="button" class="lab-reset" id="threat-start">▶️ Empezar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab" id="lab-filter">
+          <div class="lab-header">
+            <span class="lab-icon">🔎</span>
+            <h4>Filtro rápido de la tabla de amenazas</h4>
+            <span class="lab-hint">Escribe para ver solo las filas que coincidan</span>
+          </div>
+          <div class="filter-bar">
+            <input type="search" id="threat-filter" placeholder="Filtrar por tipo, ejemplo o contramedida…" autocomplete="off">
+            <span class="filter-count" id="filter-count"></span>
+            <div class="filter-chips" id="filter-chips">
+              <button type="button" class="chip" data-chip="malware">malware</button>
+              <button type="button" class="chip" data-chip="contraseña">contraseña</button>
+              <button type="button" class="chip" data-chip="red">red</button>
+              <button type="button" class="chip" data-chip="social">social</button>
+              <button type="button" class="chip" data-chip="físico">físico</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="key-box">
+          <h4>🔑 Ideas clave de la sección 6.6</h4>
+          <ul>
+            <li>La <strong>autenticación</strong> se apoya en tres familias: algo que <em>sabes</em>, que <em>tienes</em> y que <em>eres</em>; combinarlas (MFA) es la práctica recomendada.</li>
+            <li>Las contraseñas se guardan como <strong>hash con sal</strong> (y con algoritmos lentos); nunca en claro.</li>
+            <li>Los errores de código (desbordamiento de búfer, cadenas de formato, enteros, inyección) permiten <strong>controlar el flujo</strong> de un programa.</li>
+            <li>El <strong>malware</strong> se clasifica en troyanos, virus, gusanos, spyware, rootkits y ransomware, según su forma de actuar y propagarse.</li>
+            <li>Las <strong>defensas</strong> son capas: cortafuegos, firmas de código, contenedores, detección de intrusos, parches, privilegio mínimo y copias de seguridad.</li>
+          </ul>
+        </div>
+
+        <div class="quiz">
+          <div class="quiz-header"><span>📝 Comprueba lo aprendido — 6.6</span><span class="quiz-hint">Pulsa la opción que consideres correcta</span></div>
+          <div class="quiz-question" data-answer="b" data-explain="Algo que sabes = contraseña; algo que tienes = tarjeta/token; algo que eres = biometría. Combinar familias distintas es la autenticación multifactor (MFA).">
+            <p class="quiz-text"><strong>1.</strong> Un usuario se autentica con una contraseña y además con un código de su tarjeta de seguridad. ¿Qué tipo de autenticación es?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">Autenticación de un solo factor (contraseña).</button>
+              <button class="quiz-option" data-key="b">Multifactor: algo que sabes + algo que tienes.</button>
+              <button class="quiz-option" data-key="c">Autenticación biométrica.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+          <div class="quiz-question" data-answer="c" data-explain="La sal hace que dos usuarios con la misma contraseña tengan hashes distintos, lo que impide tablas precalculadas (rainbow tables) y ataques de diccionario masivos.">
+            <p class="quiz-text"><strong>2.</strong> ¿Para qué sirve añadir una «sal» (salt) al guardar una contraseña?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">Para cifrar la contraseña con una clave pública.</button>
+              <button class="quiz-option" data-key="b">Para que la contraseña sea más corta de almacenar.</button>
+              <button class="quiz-option" data-key="c">Para que dos contraseñas iguales tengan hashes distintos y se dificulte el ataque por tablas precalculadas.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+          <div class="quiz-question" data-answer="a" data-explain="Al desbordar el búfer se sobrescribe la dirección de retorno en la pila; al volver de la función, la CPU salta a la dirección que eligió el atacante.">
+            <p class="quiz-text"><strong>3.</strong> En un desbordamiento de búfer, ¿qué es lo que permite normalmente al atacante controlar el programa?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">La sobrescritura de la dirección de retorno guardada en la pila.</button>
+              <button class="quiz-option" data-key="b">El borrado del archivo de registro de auditoría.</button>
+              <button class="quiz-option" data-key="c">La modificación de la tabla de usuarios del sistema.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+          <div class="quiz-question" data-answer="b" data-explain="A diferencia del virus, el gusano es un programa independiente que se replica solo por la red, sin necesidad de infectar otros archivos.">
+            <p class="quiz-text"><strong>4.</strong> ¿Cuál es la diferencia esencial entre un virus y un gusano?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">El virus cifra datos; el gusano solo borra archivos.</button>
+              <button class="quiz-option" data-key="b">El gusano se replica solo por la red; el virus necesita hospedarse en otro programa.</button>
+              <button class="quiz-option" data-key="c">No hay diferencia: son nombres distintos para lo mismo.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6.7 Cifrado -->
+    <div id="sec67" class="tab-content">
+      <div class="section-card">
+        <h2 class="section-title">6.7. Cifrado (Criptografía en Sistemas Operativos)</h2>
+
+        <div class="concept-box">
+          Transformación matemática de datos para garantizar la confidencialidad, autenticidad e integridad tanto en almacenamiento en reposo (<em>Data at Rest</em>) como en tránsito (<em>Data in Transit</em>). La criptografía es la herramienta que convierte una información robada en información inútil: aunque el atacante la consiga, sin la clave no sirve de nada.
+        </div>
+
+        <div class="book-note">
+          <span class="book-note-icon">📖</span>
+          <div><strong>En el libro:</strong> Tanenbaum, Cap. 9.2 <strong>Fundamentos de la criptografía (cifrado)</strong>: 9.2.1 <em>Clave secreta</em>, 9.2.2 <em>Clave pública</em>, 9.2.3 <em>Funciones de una vía</em>, 9.2.4 <em>Firmas digitales</em> y 9.2.5 <em>Módulo de plataforma confiable</em>.</div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3>Cifrado Simétrico</h3>
+            <p>Utiliza una <strong>clave única compartida</strong> para cifrar y descifrar. Altamente eficiente para el cifrado masivo de almacenamiento (ej. BitLocker, LUKS).</p>
+            <p><em>Estándares principales: AES-256, ChaCha20, 3DES.</em></p>
+            <p class="card-note"><strong>Problema clásico:</strong> antes de usarlo, ambas partes deben intercambiar la clave por un canal seguro… que es justamente lo que no tienen.</p>
+          </div>
+          <div class="card">
+            <h3>Cifrado Asimétrico</h3>
+            <p>Empleado en intercambio de claves y firmas digitales mediante pares de claves <strong>Pública</strong> y <strong>Privada</strong>.</p>
+            <p><em>Estándares principales: RSA-4096, ECC (Ed25519), Diffie-Hellman.</em></p>
+            <p class="card-note"><strong>Uso real:</strong> la pública se reparte sin problema; quien tiene la privada descifra o firma. Es lenta, por eso solo se usa para lo pequeño (claves, firmas).</p>
+          </div>
+        </div>
+
+        <h3 class="sub-title" id="s67a">Comparación de los dos tipos de cifrado</h3>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Criterio</th>
+              <th>Simétrico (clave secreta)</th>
+              <th>Asimétrico (clave pública/privada)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="subject">Claves</td><td>Una sola clave compartida</td><td>Par de claves vinculadas matemáticamente</td></tr>
+            <tr><td class="subject">Velocidad</td><td>Muy rápida (10–100× más que asimétrica)</td><td>Lenta: se usa solo para cantidades pequeñas</td></tr>
+            <tr><td class="subject">Distribución</td><td>Difícil: hay que entregar la clave en secreto</td><td>Fácil: la clave pública se publica sin riesgo</td></tr>
+            <tr><td class="subject">Uso principal</td><td>Cifrar datos (discos, archivos, sesiones)</td><td>Intercambiar claves, firmar, autenticar</td></tr>
+            <tr><td class="subject">Ejemplo real</td><td>AES-256 en LUKS/BitLocker, TLS para el contenido</td><td>TLS con RSA/ECC para el apretón de manos, firmas de código</td></tr>
+          </tbody>
+        </table>
+        <div class="tip-box">
+          <span class="tip-icon">💡</span>
+          <div><strong>En la práctica se usan juntos:</strong> en HTTPS, el navegador cifra la conversación con <em>simétrico</em> (rápido), pero la clave simétrica se intercambia con <em>asimétrico</em> (seguro). Cada uno hace lo que mejor se le da.</div>
+        </div>
+
+        <h3 class="sub-title" id="s67b">Funciones de una vía (hash)</h3>
+        <p class="lead-paragraph">
+          Una función de resumen o <em>hash</em> convierte cualquier cantidad de datos en una huella digital de longitud fija. Debe cumplir tres propiedades:
+        </p>
+        <ul class="styled-list">
+          <li><strong>Unidireccionalidad:</strong> a partir del hash no se puede recuperar el dato original.</li>
+          <li><strong>Resistencia a colisiones:</strong> es inviable encontrar dos datos distintos con el mismo hash.</li>
+          <li><strong>Sensibilidad al cambio:</strong> cambiar un bit de entrada cambia por completo la huella.</li>
+        </ul>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Algoritmo</th>
+              <th>Longitud</th>
+              <th>Estado actual</th>
+              <th>Uso recomendado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="subject">MD5</td><td>128 bits</td><td>❌ Roto (colisiones encontradas)</td><td>Solo detectar corrupción accidental, nunca seguridad.</td></tr>
+            <tr><td class="subject">SHA-1</td><td>160 bits</td><td>❌ Roto para firmas</td><td>Reemplazado por SHA-256 en certificados y Git.</td></tr>
+            <tr><td class="subject">SHA-256 / SHA-3</td><td>256/512 bits</td><td>✅ Seguro</td><td>Contraseñas (con sal y función lenta), integridad, firmas.</td></tr>
+          </tbody>
+        </table>
+
+        <h3 class="sub-title" id="s67c">Firmas digitales y certificados</h3>
+        <ol class="styled-list numbered">
+          <li>El emisor calcula el <strong>hash</strong> del documento.</li>
+          <li>Cifra ese hash con su <strong>clave privada</strong>: eso es la firma.</li>
+          <li>Cualquiera verifica la firma con la <strong>clave pública</strong> del emisor y recalcula el hash.</li>
+          <li>Si ambos hashes coinciden: el documento <strong>no ha sido alterado</strong> y <strong>proviene</strong> de quien dice ser.</li>
+          <li>Los <strong>certificados X.509</strong> (PKI) vinculan la clave pública con una identidad y los emiten autoridades de certificación reconocidas (RFC 5280).</li>
+        </ol>
+
+        <h3 class="sub-title" id="s67d">Módulo de plataforma confiable (TPM)</h3>
+        <p class="lead-paragraph">
+          El TPM (cap. 9.2.5) es un <strong>chip criptográfico dedicado</strong> en la placa base que guarda claves en un entorno aislado y no extraíble. El sistema operativo lo usa para:
+        </p>
+        <ul class="styled-list">
+          <li>Guardar claves de cifrado de disco (BitLocker, LUKS) atadas al hardware.</li>
+          <li><strong>Arranque medido:</strong> registrar el hash de cada componente de arranque para detectar bootkits modificados.</li>
+          <li>Atestación remota: demostrar a un tercero que el equipo arrancó en un estado verificado.</li>
+          <li>Proteger credenciales y certificados del usuario frente a robos de disco.</li>
+        </ul>
+
+        <h3 class="sub-title" id="s67e">Dónde aplica la criptografía en un sistema operativo</h3>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Ámbito</th>
+              <th>Problema que resuelve</th>
+              <th>Solución típica</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="subject">Almacenamiento en reposo</td><td>Robo o pérdida del disco/portátil</td><td>Cifrado de disco completo: LUKS (Linux), BitLocker (Windows), FileVault (macOS)</td></tr>
+            <tr><td class="subject">Transmisión</td><td>Escucha del tráfico en la red</td><td>TLS 1.3 (HTTPS, SMTPS, SSH)</td></tr>
+            <tr><td class="subject">Acceso remoto</td><td>Contraseñas interceptadas</td><td>SSH con claves o certificados; VPN con IPsec/WireGuard</td></tr>
+            <tr><td class="subject">Autenticación</td><td>Filtración de contraseñas</td><td>Hash con sal + función lenta (yescrypt, bcrypt, Argon2)</td></tr>
+            <tr><td class="subject">Integridad y confianza</td><td>Software manipulado</td><td>Firmas de código, Secure Boot, verificación de paquetes (GPG)</td></tr>
+          </tbody>
+        </table>
+
+        <div class="example-container">
+          <div class="example-header">
+            <span>EJEMPLO TÉCNICO: Cifrado Criptográfico y Comprobación de Hash</span>
+            <span>OpenSSL / CLI</span>
+          </div>
+          <pre><code># 1. Cifrado simétrico de un archivo confidencial con estándar AES-256-CBC
+$ openssl enc -aes-256-cbc -pbkdf2 -in documento_privado.pdf -out documento_cifrado.enc
+
+# 2. Generación de Hash SHA-256 para verificación de integridad
+$ sha256sum documento_privado.pdf
+a8f5f167f44f4964e6c998dee827110c... documento_privado.pdf
+
+# 3. Proceso de descifrado con validación de clave
+$ openssl enc -d -aes-256-cbc -pbkdf2 -in documento_cifrado.enc -out documento_restaurado.pdf</code></pre>
+        </div>
+
+        <div class="example-container">
+          <div class="example-header">
+            <span>EJEMPLO TÉCNICO: Firma digital y autenticación sin contraseñas</span>
+            <span>OpenSSL + SSH</span>
+          </div>
+          <pre><code># --- FIRMA DIGITAL ---
+# 1. Generar un par de claves (asimétrico)
+$ openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:3072 -out clave_privada.pem
+
+# 2. Extraer la clave pública (se puede repartir sin peligro)
+$ openssl pkey -in clave_privada.pem -pubout -out clave_publica.pem
+
+# 3. Firmar el hash de un documento con la clave PRIVADA
+$ openssl dgst -sha256 -sign clave_privada.pem -out firma.bin informe.txt
+
+# 4. Cualquiera verifica con la clave PÚBLICA: firma válida = intacto + auténtico
+$ openssl dgst -sha256 -verify clave_publica.pem -signature firma.bin informe.txt
+Verified OK
+
+# --- ACCESO SSH SIN CONTRASEÑA (clave pública en el servidor) ---
+$ ssh-keygen -t ed25519 -C "brian@equipo"
+$ ssh-copy-id brian@servidor.corp        # instala la clave pública en el servidor
+$ ssh brian@servidor.corp                # ya no pide contraseña: firma la sesión</code></pre>
+        </div>
+
+        <!-- ===== LABORATORIO INTERACTIVO 6.7 ===== -->
+        <div class="lab" id="lab-caesar">
+          <div class="lab-header">
+            <span class="lab-icon">🏛️</span>
+            <h4>Laboratorio: cifrado César paso a paso</h4>
+            <span class="lab-hint">El más simple de todos: el mismo desplazamiento en cada letra</span>
+          </div>
+
+          <div class="caesar-wrap">
+            <div class="caesar-col">
+              <label class="caesar-label" id="caesar-lab-in" for="caesar-in">Texto original (plaintext)</label>
+              <textarea id="caesar-in" rows="4" spellcheck="false">Ataque a las tres de la mañana</textarea>
+            </div>
+            <div class="caesar-col">
+              <label class="caesar-label" id="caesar-lab-out" for="caesar-out">Texto cifrado (ciphertext)</label>
+              <textarea id="caesar-out" rows="4" readonly></textarea>
+            </div>
+          </div>
+
+          <div class="caesar-ctrl">
+            <label for="caesar-shift">Desplazamiento (clave): <strong id="caesar-shift-val">3</strong></label>
+            <input type="range" id="caesar-shift" min="1" max="25" value="3">
+            <button type="button" class="copy-btn" id="caesar-copy">Copiar</button>
+            <button type="button" class="lab-reset" id="caesar-reverse">↩️ Descifrar (invertir clave)</button>
+            <span class="caesar-hint" id="caesar-hint">Cada letra avanza 3 posiciones en el alfabeto.</span>
+          </div>
+
+          <div class="caesar-track" id="caesar-track" aria-hidden="true"></div>
+
+          <div class="caesar-brute">
+            <span class="aml-title">🕵️ Fuerza bruta: 25 intentos bastan</span>
+            <div class="brute-list" id="brute-list"></div>
+          </div>
+
+          <div class="note-box"><span class="note-icon">📌</span><div><strong>Por qué está roto:</strong> el espacio de claves son solo 25 valores, así que un atacante prueba todos en milisegundos. Además conserva la frecuencia de letras del idioma (la <em>e</em> sigue siendo la más frecuente). De aquí nacen los cifrados modernos: mucha más clave y sustitución no lineal.</div></div>
+        </div>
+
+        <div class="lab" id="lab-hash">
+          <div class="lab-header">
+            <span class="lab-icon">🌊</span>
+            <h4>Laboratorio: funciones hash y efecto avalancha</h4>
+            <span class="lab-hint">Escribe algo y cambia UNA sola letra</span>
+          </div>
+
+          <div class="hash-wrap">
+            <label class="caesar-label" for="hash-in">Mensaje</label>
+            <input type="text" id="hash-in" value="Proteccion y seguridad" autocomplete="off" spellcheck="false">
+            <div class="hash-out">
+              <span class="hash-label">SHA-256 (64 caracteres)</span>
+              <code id="hash-out">…calculando…</code>
+              <div class="hash-bars" id="hash-bars" aria-hidden="true"></div>
+            </div>
+            <div class="hash-compare" id="hash-compare" hidden>
+              <span class="hash-label">SHA-256 del mensaje alterado</span>
+              <code id="hash-out2"></code>
+              <p class="hash-diff" id="hash-diff"></p>
+            </div>
+            <button type="button" class="lab-reset" id="hash-flip">🎲 Cambiar una sola letra</button>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <h3>✔️ Propiedades que debe cumplir</h3>
+              <ul class="styled-list">
+                <li><strong>Unidireccional:</strong> dado el hash no se recupera el mensaje.</li>
+                <li><strong>Resistencia a colisiones:</strong> no debe haber dos mensajes con el mismo hash.</li>
+                <li><strong>Efecto avalancha:</strong> cambiar un bit cambia ≈ la mitad de los bits del resultado.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>🚫 Para qué NO sirve un hash</h3>
+              <ul class="styled-list">
+                <li>No cifra: cualquiera puede verificar pero nadie «descifra».</li>
+                <li>MD5 y SHA-1 están rotos: no los uses para integridad crítica.</li>
+                <li>Un hash sin clave no demuestra autoría; eso lo hace la <strong>firma digital</strong>.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="key-box">
+          <h4>🔑 Ideas clave de la sección 6.7</h4>
+          <ul>
+            <li><strong>Simétrico</strong>: rápido, una clave compartida, ideal para cifrar datos. <strong>Asimétrico</strong>: par de claves, ideal para intercambiar claves y firmar.</li>
+            <li>Las <strong>funciones hash</strong> (SHA-256) garantizan integridad; MD5 y SHA-1 ya no sirven para seguridad.</li>
+            <li>Una <strong>firma digital</strong> = hash cifrado con la clave privada: demuestra autoría e integridad a la vez.</li>
+            <li>El <strong>TPM</strong> custodia claves en hardware y permite arranque medido y atestación.</li>
+            <li>La criptografía protege en tres frentes: <strong>en reposo</strong>, <strong>en tránsito</strong> y en la <strong>autenticación</strong>.</li>
+          </ul>
+        </div>
+
+        <div class="quiz">
+          <div class="quiz-header"><span>📝 Comprueba lo aprendido — 6.7</span><span class="quiz-hint">Pulsa la opción que consideres correcta</span></div>
+          <div class="quiz-question" data-answer="a" data-explain="HTTPS combina ambos: lo asimétrico intercambia la clave de sesión de forma segura y lo simétrico cifra después todo el tráfico de forma eficiente.">
+            <p class="quiz-text"><strong>1.</strong> Al navegar por HTTPS, ¿por qué se usan a la vez cifrado asimétrico y simétrico?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">El asimétrico intercambia la clave de sesión y el simétrico cifra los datos con rapidez.</button>
+              <button class="quiz-option" data-key="b">Porque un solo algoritmo no puede cifrar texto y también imágenes.</button>
+              <button class="quiz-option" data-key="c">Para que el navegador pueda mostrar el candado de seguridad.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+          <div class="quiz-question" data-answer="c" data-explain="MD5 tiene colisiones conocidas: dos documentos distintos pueden producir el mismo hash, lo que rompe su uso en seguridad (firmas, integridad crítica).">
+            <p class="quiz-text"><strong>2.</strong> ¿Por qué no debe usarse MD5 para verificar la integridad de un paquete de software?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">Porque es demasiado lento para calcularse.</button>
+              <button class="quiz-option" data-key="b">Porque solo funciona con archivos de texto.</button>
+              <button class="quiz-option" data-key="c">Porque está roto: se pueden crear dos archivos distintos con el mismo hash.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+          <div class="quiz-question" data-answer="b" data-explain="La firma se genera cifrando el hash del documento con la clave privada; solo quien posee esa clave puede crearla, y cualquiera puede verificarla con la pública.">
+            <p class="quiz-text"><strong>3.</strong> En una firma digital, ¿con qué clave se calcula y con qué clave se verifica?</p>
+            <div class="quiz-options">
+              <button class="quiz-option" data-key="a">Se calcula y se verifica con la clave pública.</button>
+              <button class="quiz-option" data-key="b">Se calcula con la clave privada y se verifica con la clave pública.</button>
+              <button class="quiz-option" data-key="c">Se calcula con la clave pública y se verifica con la clave privada.</button>
+            </div>
+            <p class="quiz-feedback" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Referencias -->
+    <div id="secRef" class="tab-content">
+      <div class="section-card">
+        <h2 class="section-title">Referencias y Fuentes</h2>
+
+        <div class="concept-box">
+          Este módulo fue elaborado tomando como <strong>fuente principal</strong> el libro <em>Sistemas Operativos Modernos</em> (3.ª edición) de Andrew S. Tanenbaum, y como <strong>complemento</strong> las normas, estándares y recursos técnicos de reconocida autoridad listados a continuación.
+        </div>
+
+        <h3 class="sub-title" id="srefa">Fuente principal</h3>
+        <div class="ref-item ref-primary">
+          <span class="ref-num">[1]</span>
+          <div>
+            <p><strong>TANENBAUM, Andrew S.</strong> <em>Sistemas Operativos Modernos</em>. 3.ª ed. México: Pearson Educación, 2009. 1104 p. ISBN 978-607-442-046-3.</p>
+            <p class="ref-detail">Traducción de Alfonso Vidal Romero Elizondo; revisión técnica de José Ramón Ríos Sánchez y Aarón Jiménez Govea. Obra original en inglés: <em>Modern Operating Systems</em>, 3rd ed., Prentice Hall, 2008 (ISBN 978-0-13-600663-3).</p>
+            <p class="ref-detail">Contenido utilizado: <strong>Capítulo 9 «Seguridad»</strong> — 9.1 El entorno de seguridad · 9.2 Fundamentos de la criptografía (cifrado) · 9.3 Mecanismos de protección · 9.4 Autenticación · 9.5 Ataques internos · 9.6 Cómo explotar los errores (bugs) en el código · 9.7 Malware · 9.8 Defensas · 9.10 Resumen.</p>
+          </div>
+        </div>
+
+        <h3 class="sub-title" id="srefb">Correspondencia entre las secciones de esta página y el libro</h3>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Sección</th>
+              <th>Tema de la página</th>
+              <th>Secciones del libro (Tanenbaum, 3.ª ed.)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="subject">6.1</td><td>Concepto y objetivos</td><td>9.1 El entorno de seguridad; 9.3 (introducción); principios de diseño (sección 9.8 y obra de Saltzer &amp; Schroeder)</td></tr>
+            <tr><td class="subject">6.2</td><td>Clasificación</td><td>9.3.4 Sistemas confiables; 9.3.6 Modelos formales; 9.3.7 Seguridad multinivel; criterios TCSEC y Common Criteria (complemento normativo)</td></tr>
+            <tr><td class="subject">6.3</td><td>Funciones de protección</td><td>9.3.1 Dominios de protección; 9.3.4 Sistemas confiables; 9.3.5 Base de cómputo confiable (TCB)</td></tr>
+            <tr><td class="subject">6.4</td><td>Matrices de acceso</td><td>9.3.1 Dominios de protección; 9.3.2 Listas de control de acceso; 9.3.3 Capacidades</td></tr>
+            <tr><td class="subject">6.5</td><td>Protección basada en lenguaje</td><td>9.8.3 Firma de código; 9.8.6 Encapsulamiento de código móvil; 9.8.7 Seguridad de Java</td></tr>
+            <tr><td class="subject">6.6</td><td>Validación y amenazas</td><td>9.1 El entorno de seguridad; 9.4 Autenticación; 9.5 Ataques internos; 9.6 Explotación de bugs; 9.7 Malware; 9.8 Defensas</td></tr>
+            <tr><td class="subject">6.7</td><td>Cifrado</td><td>9.2 Fundamentos de la criptografía (cifrado): clave secreta, clave pública, funciones de una vía, firmas digitales y TPM</td></tr>
+          </tbody>
+        </table>
+
+        <h3 class="sub-title" id="srefc">Referencias bibliográficas clásicas</h3>
+        <div class="ref-item"><span class="ref-num">[2]</span><div><strong>LAMPSON, Butler W.</strong> «Protection». <em>ACM Operating Systems Review</em>, 5(1), 1971, pp. 18–24. — Origen del modelo de matriz de acceso (sección 6.4).</div></div>
+        <div class="ref-item"><span class="ref-num">[3]</span><div><strong>BELL, D. E. y LaPADULA, L. J.</strong> «Secure Computer Systems: Mathematical Foundations». MITRE Corp., 1973. — Modelo de seguridad multinivel «no leer hacia arriba / no escribir hacia abajo» (sección 6.2).</div></div>
+        <div class="ref-item"><span class="ref-num">[4]</span><div><strong>SALTZER, J. H. y SCHROEDER, M. D.</strong> «The Protection of Information in Computer Systems». <em>Proceedings of the IEEE</em>, 63(9), 1975, pp. 1278–1308. — Los siete principios de diseño para la seguridad (sección 6.1).</div></div>
+        <div class="ref-item"><span class="ref-num">[5]</span><div><strong>ANDERSON, J. P.</strong> «Computer Security Technology Planning Study». ESD-TR-73-51, USAF, 1972. — Conceptos de monitor de referencia y base de cómputo confiable (sección 6.3).</div></div>
+        <div class="ref-item"><span class="ref-num">[6]</span><div><strong>BIBA, K. J.</strong> «Integrity Considerations for Secure Computer Systems». MITRE Corp., 1977. — Modelo de integridad complementario al de Bell-LaPadula.</div></div>
+        <div class="ref-item"><span class="ref-num">[7]</span><div><strong>TANENBAUM, A. S. y WOODHULL, A. S.</strong> <em>Sistemas Operativos: Diseño e Implementación</em>. 3.ª ed. Pearson, 2007. — Cap. 5.4 «Seguridad»: principios de diseño y ataques genéricos.</div></div>
+
+        <h3 class="sub-title" id="srefd">Normas y estándares</h3>
+        <div class="ref-item"><span class="ref-num">[8]</span><div><strong>DoD 5200.28-STD</strong> (TCSEC, «Orange Book») — Trusted Computer System Evaluation Criteria, Departamento de Defensa de EE. UU., 1985. Clases D, C1/C2, B1–B3 y A1 (sección 6.2).</div></div>
+        <div class="ref-item"><span class="ref-num">[9]</span><div><strong>ISO/IEC 15408</strong> — Common Criteria for Information Technology Security Evaluation (v. 3.1). Niveles de evaluación EAL 1–7 (sección 6.2).</div></div>
+        <div class="ref-item"><span class="ref-num">[10]</span><div><strong>NIST FIPS 197</strong> — Advanced Encryption Standard (AES), 2001 (sección 6.7).</div></div>
+        <div class="ref-item"><span class="ref-num">[11]</span><div><strong>NIST FIPS 180-4</strong> — Secure Hash Standard (SHA-1, SHA-256, SHA-512), 2015 (sección 6.7).</div></div>
+        <div class="ref-item"><span class="ref-num">[12]</span><div><strong>NIST SP 800-63B</strong> — Digital Identity Guidelines: Authentication and Lifecycle Management, 2020 (autenticación multifactor, sección 6.6).</div></div>
+        <div class="ref-item"><span class="ref-num">[13]</span><div><strong>RFC 5280</strong> — Internet X.509 Public Key Infrastructure Certificate and CRL Profile, IETF, 2008 (certificados, sección 6.7).</div></div>
+        <div class="ref-item"><span class="ref-num">[14]</span><div><strong>RFC 8446</strong> — The Transport Layer Security (TLS) Protocol Version 1.3, IETF, 2018 (transmisión segura, sección 6.7).</div></div>
+        <div class="ref-item"><span class="ref-num">[15]</span><div><strong>MITRE CWE / CVE</strong> — Catálogo de debilidades de software y registro público de vulnerabilidades (desbordamientos de búfer, escalada de privilegios, sección 6.6).</div></div>
+
+        <h3 class="sub-title" id="srefe">Recursos en línea recomendados</h3>
+        <ul class="styled-list ref-links">
+          <li><strong>OWASP:</strong> <a href="https://owasp.org/" target="_blank" rel="noopener">owasp.org</a> — proyecto de seguridad de aplicaciones web: top 10, cheat sheets y guías de código seguro.</li>
+          <li><strong>NIST:</strong> <a href="https://www.nist.gov/" target="_blank" rel="noopener">nist.gov</a> — publicaciones especiales (SP 800), FIPS y guías de autenticación y criptografía.</li>
+          <li><strong>Common Criteria:</strong> <a href="https://www.commoncriteria.com/" target="_blank" rel="noopener">commoncriteria.com</a> — portal oficial de certificación internacional de productos de seguridad.</li>
+          <li><strong>MITRE CVE:</strong> <a href="https://www.cve.org/" target="_blank" rel="noopener">cve.org</a> — consulta pública de vulnerabilidades conocidas.</li>
+          <li><strong>Linux man-pages:</strong> <a href="https://man7.org/linux/man-pages/" target="_blank" rel="noopener">man7.org/linux/man-pages</a> — documentación oficial de llamadas al sistema y comandos (<code>chmod</code>, <code>setfacl</code>, <code>getcap</code>…).</li>
+          <li><strong>OpenSSL:</strong> <a href="https://docs.openssl.org/" target="_blank" rel="noopener">docs.openssl.org</a> — documentación de la herramienta de cifrado usada en los ejemplos.</li>
+          <li><strong>Oracle Java Security:</strong> <a href="https://docs.oracle.com/en/java/" target="_blank" rel="noopener">docs.oracle.com/en/java</a> — guías de seguridad, módulos JPMS y gestión de permisos.</li>
+        </ul>
+
+        <div class="note-box">
+          <span class="note-icon">📌</span>
+          <div><strong>Nota académica:</strong> los ejemplos de terminal y código de esta página son ilustrativos y fueron elaborados con fines didácticos a partir de los conceptos del libro y de prácticas habituales de administración de sistemas. Las citas numeradas [n] acompañan cada sección para su uso en trabajos académicos.</div>
+        </div>
+
+        <div class="key-box">
+          <h4>🔑 Cómo citar esta página</h4>
+          <p class="cite-example">Módulo Académico de Sistemas Operativos. <em>Protección y Seguridad</em> [recurso educativo en línea]. Basado en TANENBAUM, A. S., <em>Sistemas Operativos Modernos</em>, 3.ª ed., Pearson, 2009, Cap. 9. Consultado: <span id="cite-date">—</span>.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>© Módulo Académico Institucional de Sistemas Operativos — Protección y Seguridad</p>
+    <p class="footer-note">Contenido elaborado a partir de <em>Sistemas Operativos Modernos</em>, 3.ª edición, de Andrew S. Tanenbaum (Pearson, 2009), Capítulo 9, y complementado con fuentes normativas y técnicas listadas en la pestaña <button class="footer-link" onclick="openTab(event, 'secRef')">Referencias</button>.</p>
+  </footer>
+
+  <button id="back-top" class="back-top" title="Volver arriba" aria-label="Volver arriba">↑</button>
+
+  <!-- ============ CAJÓN «MI PROGRESO» ============ -->
+  <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+  <aside class="drawer" id="drawer" aria-label="Panel de progreso" aria-hidden="true">
+    <div class="drawer-head">
+      <h2>📊 Mi progreso</h2>
+      <button type="button" class="drawer-close" id="drawer-close" aria-label="Cerrar panel">✕</button>
+    </div>
+
+    <div class="drawer-body">
+      <div class="prog-ring-wrap">
+        <svg class="prog-ring" viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+          <circle class="ring-fg" id="ring-fg" cx="60" cy="60" r="52"></circle>
+        </svg>
+        <div class="ring-num"><strong id="ring-pct">0%</strong><span>completado</span></div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat"><strong id="stat-visited">0/8</strong><span>secciones vistas</span></div>
+        <div class="stat"><strong id="stat-quiz">0/22</strong><span>preguntas acertadas</span></div>
+        <div class="stat"><strong id="stat-time">0 min</strong><span>tiempo de estudio</span></div>
+        <div class="stat"><strong id="stat-labs">0</strong><span>labs completados</span></div>
+      </div>
+
+      <h3 class="drawer-sub">Secciones</h3>
+      <ul class="visit-list" id="visit-list"></ul>
+
+      <h3 class="drawer-sub">Mis notas <small>(se guardan en este navegador)</small></h3>
+      <textarea id="my-notes" class="notes-area" placeholder="Escribe aquí tus apuntes, dudas o ideas para repasar…"></textarea>
+      <div class="notes-actions">
+        <button type="button" class="mini-btn" id="notes-copy">📋 Copiar</button>
+        <button type="button" class="mini-btn" id="notes-clear">🗑️ Borrar</button>
+        <span class="notes-status" id="notes-status"></span>
+      </div>
+
+      <h3 class="drawer-sub">Logros</h3>
+      <div class="badges" id="badges">
+        <span class="badge" data-badge="explorador">🧭 Explorador — visita las 8 secciones</span>
+        <span class="badge" data-badge="curioso">🔍 Curioso — usa la búsqueda</span>
+        <span class="badge" data-badge="experimentador">🧪 Experimentador — completa un laboratorio</span>
+        <span class="badge" data-badge="estudioso">🎓 Estudioso — acierta 15 preguntas</span>
+      </div>
+
+      <button type="button" class="mini-btn danger" id="reset-all">♻️ Reiniciar todo el progreso</button>
+    </div>
+  </aside>
+
+  <!-- ============ AVISO DE GLOSARIO ============ -->
+  <div class="gloss-pop" id="gloss-pop" hidden role="tooltip"></div>
+
+  <script src="script.js?v=6"></script>
+</body>
+</html>
